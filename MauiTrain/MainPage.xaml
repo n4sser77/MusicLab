@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:FileHandler;assembly=FileHandler"
+             x:Class="MauiTrain.MainPage"
+             BackgroundColor="#1e1e1e">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30,40"
+            Spacing="25"
+            HorizontalOptions="Center"
+            VerticalOptions="CenterAndExpand">
+
+            <Image
+                Source="dotnet_bot.png"
+                HeightRequest="185"
+                Aspect="AspectFit"
+                SemanticProperties.Description="dot net bot in a hovercraft number nine" />
+
+            <Entry
+                x:Name="NameEntry"
+                Placeholder="Enter your email"
+                SemanticProperties.Hint="Enter your email"
+                MaximumWidthRequest="500"
+                BackgroundColor="#2a2a2a"
+                TextColor="#ffffff"
+                PlaceholderColor="#bbbbbb"
+                HorizontalOptions="Fill"
+                
+                />
+
+            <Entry
+                x:Name="PasswordEntry"
+                Placeholder="Enter your password"
+                SemanticProperties.Hint="Enter your password"
+                IsPassword="True"
+                MaximumWidthRequest="500"
+                BackgroundColor="#2a2a2a"
+                TextColor="#ffffff"
+                PlaceholderColor="#bbbbbb"
+                HorizontalOptions="Fill" />
+
+            <Button
+                Text="Log in"
+                BackgroundColor="#4a4a4a"
+                TextColor="#ffffff"
+                CornerRadius="20"
+                HeightRequest="50"
+                HorizontalOptions="Center"
+                WidthRequest="200"
+                SemanticProperties.Hint="Log in to your account"
+                Clicked="OnLoginClicked" />
+            <Button
+     Text="Sign up"
+     BackgroundColor="#4a4a4a"
+     TextColor="#ffffff"
+     CornerRadius="20"
+     HeightRequest="50"
+     HorizontalOptions="Center"
+     WidthRequest="200"
+     SemanticProperties.Hint="Log in to your account"
+     Clicked="OnSignupClicked" />
+
+
+
+
+            <!--<local:UploadFileBtn
+                x:Name="UploadFileBtn"
+                Text="Upload File"
+                SemanticProperties.Hint="Upload a file"
+                HorizontalOptions="Fill" />-->
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

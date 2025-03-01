@@ -1,0 +1,50 @@
+﻿@page "/EditBeat/"
+@using BlazorMaui.Services.Interfaces
+@inject NavigationManager Navigation
+@inject IBeatsService BeatsService
+
+<h1>Beat: @newBeat.Title</h1>
+
+<div>
+    <label>Title:</label>
+    <input @bind="newBeat.Title" />
+</div>
+
+<div>
+    <label>BPM:</label>
+    <input type="number" @bind="newBeat.Bpm" />
+</div>
+
+<div>
+    <label>Genre:</label>
+    <input @bind="newBeat.Genre" />
+</div>
+
+
+<Button Onclick="() => SaveChanges()">
+    @((isSaving != null) ? "Saving..." : "Save")
+</Button>
+
+@code {
+    private Beat newBeat;
+    private Beat oldBeat;
+    private string? isSaving;
+
+    protected override async void OnInitialized()
+    {
+        newBeat = BeatsService.FileToEdit;
+        oldBeat = newBeat;
+
+    }
+
+    private async Task SaveChanges()
+    {
+
+        isSaving = "Saving...";
+        StateHasChanged();
+        await Task.Delay(400);
+
+        BeatsService.UpdateAudio(newBeat, oldBeat);
+        Navigation.NavigateTo("/dashboard");
+    }
+}

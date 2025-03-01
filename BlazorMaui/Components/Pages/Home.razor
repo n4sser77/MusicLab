@@ -1,0 +1,82 @@
+﻿@page "/"
+@using BlazorMaui.Components
+@using BlazorMaui
+@using System.Text.Json
+@using System.Text
+@using System.Net.Http.Headers
+@using BlazorMaui.Services.Interfaces
+
+@inject NavigationManager Navigation
+@inject IAuthService AuthService
+@inject HttpClient Client
+
+<h1 class="text-white">Hello producers!</h1>
+
+@if (isAuthenticated)
+{
+    <p>Logged in as @userEmail</p>
+
+    <button @onclick="Logout">Logout</button>
+
+}
+else
+{
+
+    <button class="btn btn-primary" @onclick=" () => GoToLogin()">Login</button>
+    <button class="btn btn-primary" @onclick="() => GoToSignup()">Signup</button>
+
+
+    <div>
+        @message
+    </div>
+}
+
+@code {
+    private bool isAuthenticated = false;
+    private string message = "";
+    private string userEmail = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        isAuthenticated = await AuthService.IsUserAuthenticatedAsync();
+        if (isAuthenticated)
+        {
+
+            try
+            {
+                var token = await AuthService.GetTokenAsync();
+                Client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+                var rawRes = await Client.GetAsync("http://192.168.1.174:5106/api/auth/profile");
+                var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+                var jsonResponse = await rawRes.Content.ReadAsStringAsync();
+                var user = JsonSerializer.Deserialize<User>(jsonResponse, options);
+                userEmail = user.Email;
+
+            }
+            catch (Exception e)
+            {
+                message = e.Message;
+
+            }
+        }
+    }
+
+    private async Task GoToLogin()
+    {
+        Navigation.NavigateTo("/login");
+
+    }
+    private async Task GoToSignup()
+    {
+        Navigation.NavigateTo("/signup");
+    }
+
+
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        isAuthenticated = false;
+    }
+}

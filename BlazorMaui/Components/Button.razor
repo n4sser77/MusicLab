@@ -1,0 +1,10 @@
+﻿<button @onclick="OnClick" class="play-btn" >
+    @ChildContent
+    <span class="custom-underline"></span>
+</button>
+
+@code {
+    [Parameter] public EventCallback OnClick { get; set; } // Click event
+    // [Parameter] public string CssClass { get; set; } = "custom-link"; // Default CSS class
+    [Parameter] public RenderFragment? ChildContent { get; set; } // Allows custom text inside button
+}

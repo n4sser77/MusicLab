@@ -1,0 +1,171 @@
+﻿@page "/dashboard"
+@using BlazorMaui.Services.Interfaces
+
+@inject IBeatsService BeatsService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+<h3>Dashboard</h3>
+
+@if (selectedFiles?.Any() == true)
+{
+    <ul>
+        @foreach (var file in selectedFiles)
+        {
+            <li>@file.FileName</li>
+        }
+    </ul>
+}
+
+<div class="table-container">
+    <table class="beat-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>BPM</th>
+                <th>
+                    Genre
+                    <select @onchange="OnGenreChanged">
+                        <option value="">All</option>
+                        @foreach (var genre in AvailableGenres)
+                        {
+                            <option value="@genre">@genre</option>
+                        }
+                    </select>
+
+                </th>
+                <th>Plays</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var beat in FilteredBeats)
+            {
+                <tr>
+                    <td>@beat.Title</td>
+                    <td>@beat.Bpm</td>
+                    <td>@beat.Genre</td>
+                    <td>@beat.Plays</td>
+                    <td>
+                        <Button OnClick=" () => HandlePlayBtn(beat.AudioUrl)">
+                            @(currentTrack == beat.AudioUrl && MainPage.Instance.IsPlaying ? "⏸ Pause" : "▶ Play")
+                        </Button>
+                        <Button OnClick=" () => HandleEditBtn(beat)">
+                            Edit
+                        </Button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<Button OnClick=" () => PickFiles()">Pick Files</Button>
+
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        BeatsService.LoadUploaded();
+        MainPage.Instance.MediaEnded += OnAudioEnded;
+    }
+
+    private void OnAudioEnded()
+    {
+        // Called when audio finishes
+        InvokeAsync(StateHasChanged);
+    }
+
+    // Compute the available genres from the uploaded beats.
+    private IEnumerable<string> AvailableGenres =>
+        BeatsService.UploadedAudio.Select(b => b.Genre).Distinct();
+
+    // Filter the beats based on the selected genre.
+    private IEnumerable<Beat> FilteredBeats =>
+        string.IsNullOrEmpty(selectedGenre)
+            ? BeatsService.UploadedAudio
+            : BeatsService.UploadedAudio.Where(b => b.Genre == selectedGenre);
+
+    private void OnGenreChanged(ChangeEventArgs e)
+    {
+        selectedGenre = e.Value?.ToString() ?? "";
+        // Force re-render
+        StateHasChanged();
+    }
+
+    public bool ReRender;
+    private string? currentTrack;
+    private string selectedGenre = "";
+
+
+
+    private List<FileResult>? selectedFiles;
+
+    private async Task PickFiles()
+    {
+
+        var files = await FilePicker.PickMultipleAsync();
+        if (files == null) return;
+        // var validFiles = files.Where(f => f.FileName.EndsWith(".wav", StringComparison.OrdinalIgnoreCase) ||
+        //      f.FileName.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase));
+
+
+
+        selectedFiles = files.ToList();
+        foreach (var file in files)
+        {
+            BeatsService.UploadAudio(file.FullPath, file.FileName);
+        }
+
+    }
+
+    private async void PlayAudio(string selectedAudio)
+    {
+        if (string.IsNullOrEmpty(selectedAudio)) return;
+        string audioPath = Path.Combine(FileSystem.AppDataDirectory, selectedAudio);
+        await MainPage.Instance.LoadAndStartAudio(audioPath);
+    }
+
+    private void PauseAudio() => MainPage.Instance.PauseAudio();
+    private void StopAudio() => MainPage.Instance.StopAudio();
+
+
+    private void HandlePlayBtn(string url)
+    {
+
+        if (currentTrack == url && MainPage.Instance.IsPlaying)
+        {
+            MainPage.Instance.IsPlaying = false;
+            PauseAudio();
+        }
+        else if (currentTrack != url && MainPage.Instance.IsPlaying)
+        {
+            PlayAudio(url);
+            currentTrack = url;
+        }
+        else
+        {
+            PlayAudio(url);
+            currentTrack = url;
+            MainPage.Instance.IsPlaying = true;
+        }
+    }
+
+    
+
+    private void HandleEditBtn(Beat beat)
+    {
+        BeatsService.FileToEdit = beat;
+        Navigation.NavigateTo("/EditBeat");
+    }
+
+    private ElementReference audioPlayer;
+    private double CurrentPosition { get; set; } = 0;
+    private double Duration { get; set; } = 100; // Default, updated later
+
+
+
+
+
+}

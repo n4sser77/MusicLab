@@ -1,0 +1,150 @@
+﻿@page "/login"
+@using System.Net.Http
+@using System.Text.Json.Serialization
+@using BlazorMaui.Services.Interfaces
+@using ValidatorLib
+@using System.Text.Json
+@using System.Text
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject IAuthService AuthService
+@inject HttpClient Client
+@inject NavigationManager Navigation
+
+<h1 class="text-white">Login</h1>
+<div class="form-container">
+
+    <EditForm Model="@loginModel" OnValidSubmit="LoginUser">
+
+
+        <div>
+            <label class="text-white">Email:</label>
+            <InputText @bind-Value="loginModel.Email" Type="email" @oninput="e => HandleFieldChanged(e, nameof(loginModel.Email))" />
+            <p style="color: red;">@emailErrorMessage</p>
+        </div>
+
+        <div>
+            <label class="text-white">Password:</label>
+            <InputText @bind-Value="loginModel.Password" Type="password" />
+            <p style="color: red;">@passwordErrorMessage</p>
+        </div>
+
+        <button class="btn btn-primary " type="submit">Login</button>
+    </EditForm>
+    @if (!string.IsNullOrEmpty(loadingMessage))
+    {
+        <div style="margin:20px;">@loadingMessage</div>
+
+    }
+</div>
+
+@if (errorMessage != null)
+{
+    <p class="error-message">@errorMessage</p>
+}
+
+@code {
+    private LoginModel loginModel = new();
+
+    private string? errorMessage;
+    private string? emailErrorMessage;
+    private string? passwordErrorMessage;
+    private bool isAuthenticated;
+    private string? loadingMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isAuthenticated = await AuthService.IsUserAuthenticatedAsync();
+        if (isAuthenticated)
+        {
+            Navigation.NavigateTo("/", forceLoad: true);
+
+        }
+
+    }
+
+    private void HandleFieldChanged(ChangeEventArgs e, string fieldName)
+    {
+        var fieldValue = e.Value?.ToString() ?? string.Empty;
+
+        if (fieldName == nameof(loginModel.Email))
+        {
+            emailErrorMessage = string.IsNullOrEmpty(fieldValue) || !fieldValue.Contains("@")
+                ? "Invalid email format."
+                : null;
+        }
+        else if (fieldName == nameof(loginModel.Password))
+        {
+            passwordErrorMessage = string.IsNullOrEmpty(fieldValue) || fieldValue.Length < 6
+                ? "Password must be at least 6 characters."
+                : null;
+        }
+    }
+
+
+
+    private async Task LoginUser()
+    {
+        loadingMessage = " Loading...";
+        StateHasChanged();
+        try
+        {
+
+            var json = JsonSerializer.Serialize(loginModel);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+
+
+            var response = await Client.PostAsync("http://192.168.1.174:5106/api/auth/login", content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // var options = new JsonSerializerOptions
+                //     {
+                //         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                //     };
+
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                // var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonResponse);
+                var res = JsonSerializer.Deserialize<ResponseModel>(jsonResponse);
+
+
+                await AuthService.SaveTokenAsync(res.Token);
+                isAuthenticated = true;
+                errorMessage = null;
+                loadingMessage = "";
+                Navigation.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                loadingMessage = "";
+                isAuthenticated = false;
+                errorMessage = "Wrong credentials: " + response.StatusCode;
+            }
+        }
+        catch (Exception e)
+        {
+            loadingMessage = "";
+            // errorMessage = "Error authenticating, internal error. Contact us.";
+            errorMessage = e.Message;
+
+        }
+    }
+
+    private class LoginModel
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    private class ResponseModel
+    {
+        [JsonPropertyName("token")]
+
+        public string Token { get; set; }
+        [JsonPropertyName("message")]
+
+        public string Message { get; set; }
+    }
+}

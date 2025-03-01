@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:BlazorMaui"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             BackgroundColor="Black"
+
+             x:Class="BlazorMaui.MainPage">
+
+    <Grid RowDefinitions="* , 40,40,40" RowSpacing="5" Margin="2, 2, 2 ,10" BackgroundColor="Black">
+
+
+
+        <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html" Grid.Row="0">
+            <BlazorWebView.RootComponents>
+                <RootComponent Selector="#app" ComponentType="{x:Type local:Components.Routes}" />
+
+            </BlazorWebView.RootComponents>
+
+        </BlazorWebView>
+        <!-- Media Player Positioned at the Bottom -->
+
+        <toolkit:MediaElement x:Name="mediaPlayer"
+                                   
+                                   ShouldShowPlaybackControls="False"   
+                                   MediaEnded="mediaPlayer_MediaEnded"   
+                                    Grid.Row="1"   
+                                    MediaOpened="OnMediaOpened"
+                              
+                                   />
+
+        <Slider 
+            x:Name="AudioSlider" 
+            Grid.Row="1" 
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" 
+            HeightRequest="50" 
+            Opacity="0.75"  
+            WidthRequest="400" 
+            ValueChanged="OnAudioSliderValueChanged"
+            DragCompleted="OnAudioSliderDragCompleted"
+            DragStarted="OnAudioSliderDragStarted"
+            
+            Minimum="0"
+            
+            />
+
+        <Label 
+             x:Name="DebugLabel" 
+            Grid.Row="2" 
+            VerticalOptions="Start" 
+            HorizontalOptions="End" 
+            FontSize="14" 
+            Text="{Binding Source=mediaPlayer, Path=Position.TotalSeconds, StringFormat='Current: {0:0} / {1:0}'}"
+        />
+        <Label 
+     x:Name="DebugLabelSlider" 
+    Grid.Row="2" 
+    VerticalOptions="End" 
+    HorizontalOptions="Start" 
+    FontSize="14" 
+/>
+
+        <Button
+            x:Name="PlayPauseBtn"
+            Text="Play"
+            Clicked="OnPlayPauseClick"
+            Grid.Row="3"
+            VerticalOptions="End"
+            HorizontalOptions="Center"
+            
+            
+            >
+            <Button.Triggers>
+                <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="True">
+                    <Setter Property="Text" Value="Pause"/>
+                </DataTrigger>
+                <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="False">
+                    <Setter Property="Text" Value="Play"/>
+                </DataTrigger>
+            </Button.Triggers>
+        </Button>
+
+
+
+
+
+
+
+    </Grid>
+
+</ContentPage>
