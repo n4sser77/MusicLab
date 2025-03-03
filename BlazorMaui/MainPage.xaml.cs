@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using BlazorMaui.Helpers;
 
 
+
 namespace BlazorMaui
 {
     public partial class MainPage : ContentPage
@@ -19,7 +20,7 @@ namespace BlazorMaui
         public MainPage()
         {
             InitializeComponent();
-            BindingContext = this; // 🔹 Make sure MainPage is the binding context
+            BindingContext = this; // Make sure MainPage is the binding context
             Instance = this;
             AudioSlider.BindingContext = mediaPlayer;
             var timespanToDouble = new TimeSpanToDoubleConverter();
@@ -58,10 +59,6 @@ namespace BlazorMaui
                 // Now Set the New Source and Play
                 mediaPlayer.ShouldAutoPlay = true;
                 mediaPlayer.Source = MediaSource.FromFile(filePath);
-
-
-
-
                 AudioSlider.Value = 0;
 
                 IsPlaying = true;
@@ -81,7 +78,7 @@ namespace BlazorMaui
             MediaPlayer.Stop();
             IsPlaying = false;
         }
-        
+
 
         public event Action? MediaEnded;
 
@@ -95,10 +92,23 @@ namespace BlazorMaui
 
         private async void OnAudioSliderValueChanged(object sender, ValueChangedEventArgs e)
         {
+            var (totalMin, seconds) = CalculateTotalSecoundsToMinutes(mediaPlayer.Position.TotalSeconds);
+            DebugLabelSlider.Text = totalMin + ":" + seconds.ToString("00");
+            var (totalMinDuration, secondsDuration) = CalculateTotalSecoundsToMinutes(mediaPlayer.Duration.TotalSeconds);
+            DebugLabel.Text = totalMinDuration + ":" + secondsDuration.ToString("00");
 
-            DebugLabel.Text = $"Current: {(int)mediaPlayer.Position.TotalSeconds} of {(int)mediaPlayer.Duration.TotalSeconds} {sender.GetType()}";
-            DebugLabelSlider.Text = "Slider value: " + AudioSlider.Value + " Slider Length:" + AudioSlider.Maximum;
+            void DebugSliderValues(object sender)
+            {
+                DebugLabel.Text = $"{(int)mediaPlayer.Position.TotalSeconds} of {(int)mediaPlayer.Duration.TotalSeconds} {sender.GetType()}";
+                DebugLabelSlider.Text = "Slider value: " + AudioSlider.Value + " Slider Length:" + AudioSlider.Maximum;
+            }
 
+            (int, int) CalculateTotalSecoundsToMinutes(double totalSecounds)
+            {
+                var totalMin = Math.Floor((totalSecounds / 60));
+                var remaingingSec = totalSecounds - totalMin * 60;
+                return ((int)totalMin, (int)remaingingSec);
+            }
         }
 
         public async void OnPlayPauseClick(object sender, EventArgs e)
@@ -122,13 +132,13 @@ namespace BlazorMaui
 
         private async void OnAudioSliderDragCompleted(object sender, EventArgs e)
         {
+
             if (isDraging)
             {
                 var pos = TimeSpan.FromSeconds(AudioSlider.Value);
-                await MediaPlayer.SeekTo(pos);
+                MainThread.BeginInvokeOnMainThread(async () => await mediaPlayer.SeekTo(pos));
+                //await MediaPlayer.SeekTo(pos);
             }
-
-            DebugLabel.Text = $"DragCompleted - Current: {(int)mediaPlayer.Position.TotalSeconds} of {(int)mediaPlayer.Duration.TotalSeconds} {sender.GetType().Name} ";
             isDraging = false;
         }
 
@@ -152,25 +162,10 @@ namespace BlazorMaui
 
         private async void OnMediaOpened(object sender, EventArgs e)
         {
-            //// Wait for duration to become available
-            //for (int i = 0; i < 10; i++) // Try for ~1 second
-            //    {
-            //        if (mediaPlayer.Duration.TotalSeconds > 0 )
-            //            break;
-
-            //        await Task.Delay(100);
-            //    }
-
-
-
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 AudioSlider.Maximum = mediaPlayer.Duration.TotalSeconds;
             });
-
-
-            // Reset Slider 
-
 
         }
     }

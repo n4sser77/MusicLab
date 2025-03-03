@@ -7,11 +7,11 @@
 
              x:Class="BlazorMaui.MainPage">
 
-    <Grid RowDefinitions="* , 40,40,40" RowSpacing="5" Margin="2, 2, 2 ,10" BackgroundColor="Black">
+    <Grid RowDefinitions="* , auto"  RowSpacing="5"  BackgroundColor="Black">
 
 
 
-        <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html" Grid.Row="0">
+        <BlazorWebView Grid.ColumnSpan="3" x:Name="blazorWebView" HostPage="wwwroot/index.html" Grid.Row="0">
             <BlazorWebView.RootComponents>
                 <RootComponent Selector="#app" ComponentType="{x:Type local:Components.Routes}" />
 
@@ -29,9 +29,10 @@
                               
                                    />
 
-        <Slider 
+        <Grid HorizontalOptions="Center" VerticalOptions="End"  Grid.Row="1" RowDefinitions="auto,auto,auto">
+            <Slider 
             x:Name="AudioSlider" 
-            Grid.Row="1" 
+            Grid.Row="0" 
             VerticalOptions="Center" 
             HorizontalOptions="Center" 
             HeightRequest="50" 
@@ -45,42 +46,49 @@
             
             />
 
-        <Label 
+            <Label 
+            
              x:Name="DebugLabel" 
-            Grid.Row="2" 
-            VerticalOptions="Start" 
+            
+            Grid.Row="1" 
+            
+            VerticalOptions="Center" 
             HorizontalOptions="End" 
             FontSize="14" 
-            Text="{Binding Source=mediaPlayer, Path=Position.TotalSeconds, StringFormat='Current: {0:0} / {1:0}'}"
         />
-        <Label 
+            <Label 
      x:Name="DebugLabelSlider" 
-    Grid.Row="2" 
-    VerticalOptions="End" 
-    HorizontalOptions="Start" 
+    
+                Grid.Row="1"
+    
+VerticalOptions="Center" 
+HorizontalOptions="Start"
     FontSize="14" 
 />
 
-        <Button
+            <Button
             x:Name="PlayPauseBtn"
             Text="Play"
+                Margin="10,10,10,55"
             Clicked="OnPlayPauseClick"
-            Grid.Row="3"
-            VerticalOptions="End"
+            Grid.Row="2"
+            VerticalOptions="Center"
             HorizontalOptions="Center"
             
             
             >
-            <Button.Triggers>
-                <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="True">
-                    <Setter Property="Text" Value="Pause"/>
-                </DataTrigger>
-                <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="False">
-                    <Setter Property="Text" Value="Play"/>
-                </DataTrigger>
-            </Button.Triggers>
-        </Button>
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="True">
+                        <Setter Property="Text" Value="Pause"/>
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="False">
+                        <Setter Property="Text" Value="Play"/>
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
 
+        </Grid>
+        
 
 
 
