@@ -10,11 +10,12 @@
 @inject IAuthService AuthService
 @inject HttpClient Client
 
-<h1 class="text-white">Hello producers!</h1>
+
+<h1 class="text-white">@(isAuthenticated ? "Welcome" : "Sign in or create an account")</h1>
 
 @if (isAuthenticated)
 {
-    <p>Logged in as @userEmail</p>
+    <p class="text-white-50">Logged in as @userEmail</p>
 
     <button @onclick="Logout">Logout</button>
 
@@ -38,6 +39,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        MainPage.Instance.HideAudioElement();
         isAuthenticated = await AuthService.IsUserAuthenticatedAsync();
         if (isAuthenticated)
         {
@@ -53,7 +55,7 @@ else
                 var jsonResponse = await rawRes.Content.ReadAsStringAsync();
                 var user = JsonSerializer.Deserialize<User>(jsonResponse, options);
                 userEmail = user.Email;
-
+                AuthService.StoreUserId(user.Id);
             }
             catch (Exception e)
             {

@@ -6,9 +6,12 @@ namespace BlazorMaui.Helpers;
 
 public class TimeSpanToDoubleConverter : IValueConverter
 {
+    
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (value is TimeSpan timeSpan)
+        //if (DragingState.GetIsDraging()) return false; // Prevent UI updates when dragging
+
+        if (value is TimeSpan timeSpan )
         {
             return timeSpan.TotalSeconds; // Convert TimeSpan to total seconds as a double
         }
@@ -17,6 +20,7 @@ public class TimeSpanToDoubleConverter : IValueConverter
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
+        //if (DragingState.GetIsDraging()) return false; // Prevent UI updates when dragging
         if (value is double seconds)
         {
             return TimeSpan.FromSeconds(seconds); // Convert double back to TimeSpan

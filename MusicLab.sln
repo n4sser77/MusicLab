@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Validator", "Validator\Vali
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorMaui", "BlazorMaui\BlazorMaui.csproj", "{96D2C5FB-34A1-44E3-9DBB-6F0D39DBE004}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{F48436F3-E19B-457A-AC72-F6E06130366D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,8 +30,15 @@ Global
 		{96D2C5FB-34A1-44E3-9DBB-6F0D39DBE004}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{96D2C5FB-34A1-44E3-9DBB-6F0D39DBE004}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96D2C5FB-34A1-44E3-9DBB-6F0D39DBE004}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F48436F3-E19B-457A-AC72-F6E06130366D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F48436F3-E19B-457A-AC72-F6E06130366D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F48436F3-E19B-457A-AC72-F6E06130366D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F48436F3-E19B-457A-AC72-F6E06130366D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {058BC93E-485D-4BD1-A621-E9CA35E606B2}
 	EndGlobalSection
 EndGlobal

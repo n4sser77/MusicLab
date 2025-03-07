@@ -405,3 +405,101 @@ h1:focus {
         padding-left: env(safe-area-inset-left);
     }
 }
+
+
+
+/* From Uiverse.io by ahmed150up */
+.audio-player {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 75%;
+    height: 100px;
+    background-color: #282828;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px;
+    box-sizing: border-box;
+}
+
+.album-cover {
+    width: 64px;
+    height: 64px;
+    background-color: black;
+    border-radius: 50%;
+    margin-right: 12px;
+}
+
+.player-controls {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.song-info {
+    margin-bottom: 4px;
+}
+
+.song-title {
+    font-size: 16px;
+    color: #fff;
+    margin: 0;
+}
+
+.artist {
+    font-size: 12px;
+    color: #b3b3b3;
+    margin: 0;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background-color: #4f4f4f;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress {
+    width: 50%;
+    height: 100%;
+    background-color: #1db954;
+    transform-origin: left;
+    animation: progress-animation 10s linear infinite;
+}
+
+.buttons {
+    display: flex;
+}
+
+button {
+    background: none;
+    border: 1px solid white;
+    cursor: pointer;
+    outline: none;
+}
+
+.play-btn-2,
+.pause-btn-2 {
+    font-size: 4px;
+    color: #fff;
+    padding:5px;
+    height: 30px;
+    margin: 4px;
+    transition: transform 0.2s ease-in-out;
+}
+
+    .play-btn-2:hover,
+    .pause-btn-2:hover {
+        transform: scale(1.05);
+    }
+
+@keyframes progress-animation {
+    0% {
+        transform: scaleX(0);
+    }
+
+    100% {
+        transform: scaleX(1);
+    }
+}

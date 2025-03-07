@@ -10,6 +10,7 @@ public interface IBeatsService
     public void LoadUploaded();
 
     public void UploadAudio(string fullpath, string title);
+    public Task<bool> PublishAudio(Beat beat, int userId);
 
     public void UpdateAudio(Beat newBeat, Beat oldBeat);
 

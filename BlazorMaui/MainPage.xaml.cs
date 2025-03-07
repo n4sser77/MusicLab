@@ -16,17 +16,19 @@ namespace BlazorMaui
         public static MainPage Instance { get; private set; }
         public MediaElement MediaPlayer => mediaPlayer;
         private bool isDraging = false;
+        private TimeSpanToDoubleConverter timespanToDouble = new TimeSpanToDoubleConverter();
 
         public MainPage()
         {
             InitializeComponent();
+
             BindingContext = this; // Make sure MainPage is the binding context
             Instance = this;
             AudioSlider.BindingContext = mediaPlayer;
             var timespanToDouble = new TimeSpanToDoubleConverter();
 
-            AudioSlider.SetBinding(Slider.ValueProperty, nameof(MediaElement.Position), BindingMode.Default, timespanToDouble);
-            AudioSlider.SetBinding(Slider.MaximumProperty, nameof(MediaElement.Duration), BindingMode.Default, timespanToDouble);
+            AudioSlider.SetBinding(Slider.ValueProperty, nameof(MediaElement.Position), BindingMode.TwoWay, timespanToDouble);
+            AudioSlider.SetBinding(Slider.MaximumProperty, nameof(MediaElement.Duration), BindingMode.OneWay, timespanToDouble);
 
             //MediaPlayer.BindingContext = "AudioSlider";
             //MediaPlayer.SetBinding(CommunityToolkit.Maui.Views.MediaElement.PositionProperty,"")
@@ -92,10 +94,15 @@ namespace BlazorMaui
 
         private async void OnAudioSliderValueChanged(object sender, ValueChangedEventArgs e)
         {
-            var (totalMin, seconds) = CalculateTotalSecoundsToMinutes(mediaPlayer.Position.TotalSeconds);
-            DebugLabelSlider.Text = totalMin + ":" + seconds.ToString("00");
-            var (totalMinDuration, secondsDuration) = CalculateTotalSecoundsToMinutes(mediaPlayer.Duration.TotalSeconds);
-            DebugLabel.Text = totalMinDuration + ":" + secondsDuration.ToString("00");
+            var (totalMin, seconds) = CalculateTotalSecoundsToMinutes(AudioSlider.Value);
+            var (totalMinDuration, secondsDuration) = CalculateTotalSecoundsToMinutes(AudioSlider.Maximum);
+
+            await Application.Current.Dispatcher.DispatchAsync(async () => DebugLabelSlider.Text = totalMin + ":" + seconds.ToString("00"));
+            await Application.Current.Dispatcher.DispatchAsync(async () => DebugLabel.Text = totalMinDuration + ":" + secondsDuration.ToString("00"));
+            //MainThread.BeginInvokeOnMainThread(
+            //    async () => DebugLabelSlider.Text = totalMin + ":" + seconds.ToString("00"));
+            //MainThread.BeginInvokeOnMainThread(
+            //    async () => DebugLabel.Text = totalMinDuration + ":" + secondsDuration.ToString("00"));
 
             void DebugSliderValues(object sender)
             {
@@ -113,7 +120,6 @@ namespace BlazorMaui
 
         public async void OnPlayPauseClick(object sender, EventArgs e)
         {
-
 
             if (MediaPlayer.CurrentState == MediaElementState.Stopped ||
         MediaPlayer.CurrentState == MediaElementState.Paused)
@@ -136,10 +142,18 @@ namespace BlazorMaui
             if (isDraging)
             {
                 var pos = TimeSpan.FromSeconds(AudioSlider.Value);
-                MainThread.BeginInvokeOnMainThread(async () => await mediaPlayer.SeekTo(pos));
+                await Application.Current.Dispatcher.DispatchAsync(async () =>
+                await mediaPlayer.SeekTo(pos));
+                //MainThread.BeginInvokeOnMainThread(async () => await mediaPlayer.SeekTo(pos));
+
+
+                isDraging = false;
+                DragingState.SetIsDraging();
+
+                //mediaPlayer.Play();
                 //await MediaPlayer.SeekTo(pos);
             }
-            isDraging = false;
+
         }
 
         //private async void OnPositionChanged(object sender, MediaPositionChangedEventArgs e)
@@ -153,11 +167,20 @@ namespace BlazorMaui
         //        AudioSlider.Value = e.Position.TotalSeconds;
 
         //    }
+
+        //    if (isDraging) return; // 🔹 Ignore position updates while dragging
+
+        //    AudioSlider.Value = e.Position.TotalSeconds; // Update when not dragging
+
         //}
 
-        private void OnAudioSliderDragStarted(object sender, EventArgs e)
+        private async void OnAudioSliderDragStarted(object sender, EventArgs e)
         {
+            //mediaPlayer.Pause();
             isDraging = true;
+            DragingState.SetIsDraging();
+            AudioSlider.RemoveBinding(Slider.ValueProperty);
+
         }
 
         private async void OnMediaOpened(object sender, EventArgs e)
@@ -167,6 +190,34 @@ namespace BlazorMaui
                 AudioSlider.Maximum = mediaPlayer.Duration.TotalSeconds;
             });
 
+        }
+
+        private async void OnAudioSeekCompleted(object sender, EventArgs e)
+        {
+            await Task.Delay(200);
+            await Application.Current.Dispatcher.DispatchAsync(async () =>
+            {
+
+                AudioSlider.SetBinding(Slider.ValueProperty,
+                nameof(MediaElement.Position),
+                BindingMode.TwoWay, timespanToDouble);
+            });
+
+            //MainThread.BeginInvokeOnMainThread(async () =>
+            //{
+
+            //    AudioSlider.SetBinding(Slider.ValueProperty,
+            //    nameof(MediaElement.Position),
+            //    BindingMode.TwoWay, timespanToDouble);
+            //});
+        }
+        public async void ShowAudioElement()
+        {
+            AudioContainer.IsVisible = true;
+        }
+        public async void HideAudioElement()
+        {
+            AudioContainer.IsVisible = false;
         }
     }
 }

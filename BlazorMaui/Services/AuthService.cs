@@ -8,13 +8,15 @@ namespace BlazorMaui.Services;
 public class AuthService : IAuthService
 {
     private const string TokenKey = "Token";
-    
+    public int UserId { get; set; }
+
 
 
     public async Task<bool> IsUserAuthenticatedAsync()
     {
         var token = await SecureStorage.GetAsync(TokenKey);
-            bool isAuthenticated = !string.IsNullOrEmpty(token);
+        bool isAuthenticated = !string.IsNullOrEmpty(token);
+
         return isAuthenticated;
     }
 
@@ -27,6 +29,10 @@ public class AuthService : IAuthService
     {
         return await SecureStorage.GetAsync(TokenKey);
     }
+    public async Task StoreUserId(int userId)
+    {
+        UserId = userId;
+    }
 
     public async Task LogoutAsync()
     {
@@ -34,7 +40,7 @@ public class AuthService : IAuthService
         return;
     }
 
-    
+
 
 
 }

@@ -106,7 +106,6 @@
                 //     };
 
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                // var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonResponse);
                 var res = JsonSerializer.Deserialize<ResponseModel>(jsonResponse);
 
 
@@ -143,8 +142,10 @@
         [JsonPropertyName("token")]
 
         public string Token { get; set; }
-        [JsonPropertyName("message")]
 
+        [JsonPropertyName("message")]
         public string Message { get; set; }
+
+
     }
 }

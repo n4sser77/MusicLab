@@ -4,7 +4,6 @@
              xmlns:local="clr-namespace:BlazorMaui"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              BackgroundColor="Black"
-
              x:Class="BlazorMaui.MainPage">
 
     <Grid RowDefinitions="* , auto"  RowSpacing="5"  BackgroundColor="Black">
@@ -26,10 +25,12 @@
                                    MediaEnded="mediaPlayer_MediaEnded"   
                                     Grid.Row="1"   
                                     MediaOpened="OnMediaOpened"
+                                    SeekCompleted="OnAudioSeekCompleted"
+                                    
                               
                                    />
 
-        <Grid HorizontalOptions="Center" VerticalOptions="End"  Grid.Row="1" RowDefinitions="auto,auto,auto">
+        <Grid HorizontalOptions="Center" VerticalOptions="End"  Grid.Row="1" RowDefinitions="auto,auto,auto" x:Name="AudioContainer">
             <Slider 
             x:Name="AudioSlider" 
             Grid.Row="0" 
@@ -41,6 +42,7 @@
             ValueChanged="OnAudioSliderValueChanged"
             DragCompleted="OnAudioSliderDragCompleted"
             DragStarted="OnAudioSliderDragStarted"
+            IsVisible="True"
             
             Minimum="0"
             
@@ -51,20 +53,19 @@
              x:Name="DebugLabel" 
             
             Grid.Row="1" 
-            
+            Text="0:00"
             VerticalOptions="Center" 
             HorizontalOptions="End" 
             FontSize="14" 
         />
             <Label 
-     x:Name="DebugLabelSlider" 
-    
+                Text="0:00"
+                x:Name="DebugLabelSlider" 
                 Grid.Row="1"
-    
-VerticalOptions="Center" 
-HorizontalOptions="Start"
-    FontSize="14" 
-/>
+                VerticalOptions="Center" 
+                HorizontalOptions="Start"
+                FontSize="14" 
+                            />
 
             <Button
             x:Name="PlayPauseBtn"
@@ -73,10 +74,8 @@ HorizontalOptions="Start"
             Clicked="OnPlayPauseClick"
             Grid.Row="2"
             VerticalOptions="Center"
-            HorizontalOptions="Center"
-            
-            
-            >
+            HorizontalOptions="Center">
+                
                 <Button.Triggers>
                     <DataTrigger TargetType="Button" Binding="{Binding IsPlaying}" Value="True">
                         <Setter Property="Text" Value="Pause"/>
@@ -85,10 +84,11 @@ HorizontalOptions="Start"
                         <Setter Property="Text" Value="Play"/>
                     </DataTrigger>
                 </Button.Triggers>
+                
             </Button>
 
         </Grid>
-        
+
 
 
 

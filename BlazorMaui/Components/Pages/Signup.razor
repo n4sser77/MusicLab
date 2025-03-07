@@ -1,6 +1,7 @@
 ﻿@page "/signup"
 @using System.Net.Http
 @using BlazorMaui.Services.Interfaces
+@using System.Text.Json.Serialization
 @using ValidatorLib
 @using System.Text.Json
 @using System.Text
@@ -90,9 +91,9 @@
 
             if (response.IsSuccessStatusCode)
             {
-                var tokenJson = await response.Content.ReadAsStringAsync();
-                var token = JsonSerializer.Deserialize<TokenModel>(tokenJson);
-                await AuthService.SaveTokenAsync(token.Token);
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                var res = JsonSerializer.Deserialize<ResponseModel>(jsonResponse);
+                await AuthService.SaveTokenAsync(res.Token);
                 isAuthenticated = true;
                 errorMessage = null;
                 Navigation.NavigateTo("/", forceLoad: true);
@@ -120,8 +121,13 @@
         public string Password { get; set; } = string.Empty;
     }
 
-    private class TokenModel
+    private class ResponseModel
     {
+        [JsonPropertyName("token")]
+
         public string Token { get; set; }
+        [JsonPropertyName("message")]
+
+        public string Message { get; set; }
     }
 }

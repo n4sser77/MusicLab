@@ -1,14 +1,18 @@
 ﻿using BlazorMaui.Helpers;
 using BlazorMaui.Services.Interfaces;
 using CommunityToolkit.Maui.Views;
+using Shared.Dtos;
+using System.Diagnostics;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 
 public class BeatsService : IBeatsService
 {
     public List<Beat> UploadedAudio { get; set; } = new();
     string jsonFilePath = Path.Combine(FileSystem.AppDataDirectory, "audio_metadata.json");
-    
+
 
 
     //public bool _isPlaying = false;
@@ -112,6 +116,50 @@ public class BeatsService : IBeatsService
             beatToUpdate.Bpm = newBeat.Bpm;
             beatToUpdate.Genre = newBeat.Genre;
             beatToUpdate.AudioUrl = newBeat.AudioUrl;
+        }
+    }
+
+    public async Task<bool> PublishAudio(Beat beat, int userId)
+    {
+
+        string filePath = beat.AudioUrl;
+        string serverUrl = "http://192.168.1.174:5106/api/files/uploadfile";
+        string serverUrlLocalHost = "http://localhost:5106/api/files/uploadfile";
+        using var client = new HttpClient();
+        using var form = new MultipartFormDataContent();
+        try
+        {
+
+            // Read file bytes
+            var fileContent = new ByteArrayContent(await File.ReadAllBytesAsync(filePath));
+            fileContent.Headers.ContentType = new MediaTypeHeaderValue("audio/mpeg");
+
+            // Create DTO and serialize to JSON
+            var metadata = new MusicMetadataDto { Title = beat.Title, UserId = userId, Bpm = beat.Bpm, Genre = beat.Genre };
+            var metadataJson = JsonSerializer.Serialize(metadata);
+
+
+            // Add file
+            form.Add(fileContent, "file", Path.GetFileName(filePath));
+
+
+            // Add serialized DTO as a string field
+            form.Add(new StringContent(metadataJson, Encoding.UTF8, "application/json"), "musicMetadataDto");
+
+            // Send request
+            var response = await client.PostAsync(serverUrlLocalHost, form);
+            var responseString = await response.Content.ReadAsStringAsync();
+            var res = JsonSerializer.Deserialize<FileuploadResponseDto>(responseString);
+            if (string.IsNullOrEmpty(res.message)) return false;
+
+            return true;
+
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e.Message);
+            return false;
+            throw;
         }
     }
 

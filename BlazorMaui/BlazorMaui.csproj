@@ -70,6 +70,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Shared\Shared.csproj" />
       <ProjectReference Include="..\Validator\Validator.csproj" />
     </ItemGroup>
 

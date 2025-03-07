@@ -2,6 +2,7 @@
 @using BlazorMaui.Services.Interfaces
 @inject NavigationManager Navigation
 @inject IBeatsService BeatsService
+@inject IAuthService Auth
 
 <h1>Beat: @newBeat.Title</h1>
 
@@ -24,16 +25,38 @@
 <Button Onclick="() => SaveChanges()">
     @((isSaving != null) ? "Saving..." : "Save")
 </Button>
-
+<Button Onclick="async () => await PublishAudio()">
+    @((isSaving != null) ? "Publishing..." : "Publish")
+</Button>
+<div class="h-50">
+    <span class="text-white-50 font-monospace"></span>
+</div>
 @code {
     private Beat newBeat;
     private Beat oldBeat;
     private string? isSaving;
+    private string? publishMessage;
 
     protected override async void OnInitialized()
     {
         newBeat = BeatsService.FileToEdit;
         oldBeat = newBeat;
+
+    }
+    private async Task PublishAudio()
+    {
+        if (!await Auth.IsUserAuthenticatedAsync())
+        {
+            return;
+        }
+        var isSuccess = await BeatsService.PublishAudio(newBeat, Auth.UserId);
+        if (!isSuccess)
+        {
+            publishMessage = "Failed to publish";
+            return;
+        }
+
+        publishMessage = "Published successfully";
 
     }
 

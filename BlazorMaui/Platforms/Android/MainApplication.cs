@@ -2,6 +2,10 @@
 using Android.Runtime;
 using System.Reflection;
 
+[assembly: UsesPermission(Android.Manifest.Permission.ReadExternalStorage, MaxSdkVersion = 32)]
+[assembly: UsesPermission(Android.Manifest.Permission.ReadMediaAudio)]
+[assembly: UsesPermission(Android.Manifest.Permission.ReadMediaImages)]
+[assembly: UsesPermission(Android.Manifest.Permission.ReadMediaVideo)]
 
 namespace BlazorMaui
 {
@@ -10,10 +14,6 @@ namespace BlazorMaui
 #else
 [Application]
 #endif
-    [assembly: UsesPermission(Android.Manifest.Permission.ReadExternalStorage, MaxSdkVersion = 32)]
-    [assembly: UsesPermission(Android.Manifest.Permission.ReadMediaAudio)]
-    [assembly: UsesPermission(Android.Manifest.Permission.ReadMediaImages)]
-    [assembly: UsesPermission(Android.Manifest.Permission.ReadMediaVideo)]
 
 
     public class MainApplication : MauiApplication
