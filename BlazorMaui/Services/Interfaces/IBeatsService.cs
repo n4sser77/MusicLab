@@ -11,6 +11,7 @@ public interface IBeatsService
 
     public void UploadAudio(string fullpath, string title);
     public Task<bool> PublishAudio(Beat beat, int userId);
+    public Task<bool> DeleteLocalAudio(Beat beat);
 
     public void UpdateAudio(Beat newBeat, Beat oldBeat);
 

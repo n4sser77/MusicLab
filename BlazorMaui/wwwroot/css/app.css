@@ -5,13 +5,6 @@ html, body {
     max-width: 100%;
 }
 
-.dropzone {
-    width: 75%;
-    background-color: darkblue;
-    margin: 10px;
-    border: 5px solid white;
-    height: 200px;
-}
 
 .beat-item {
     display: flex;
@@ -133,9 +126,9 @@ input[type="range"] {
 
 
 button {
-    background-color: #444;
+    background: rgba(0, 0, 0, 0.5);
     color: white;
-    border: none;
+    border: 1px;
     padding: 10px 15px;
     font-size: 16px;
     cursor: pointer;
@@ -143,11 +136,13 @@ button {
 }
 
     button:hover {
-        background-color: #666;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border-color: gray;
     }
 
 select {
-    background: none;
+    background: rgba(0, 0, 0, 0.5);
     border: 0px solid #fff;
     border-radius: 8px;
     accent-color: #333;
@@ -157,11 +152,11 @@ select {
 }
 
     select:hover {
-        background-color: #333;
+        background: rgba(0, 0, 0, 0.5);
     }
 
 .play-btn {
-    background: none;
+    background: rgba(0, 0, 0, 0.5);
     border: 1px solid #fff;
     padding: 8px 12px;
     cursor: pointer;
@@ -170,7 +165,8 @@ select {
 }
 
     .play-btn:hover {
-        background: #333;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
     }
 
 
@@ -256,7 +252,7 @@ form {
 
     /* Change text color on hover for a subtle effect */
     .custom-link:hover {
-        color: #1e293b;
+        color: background: rgba(250, 250, 250, 0.7);
     }
 
 /* The underline element */
@@ -296,7 +292,7 @@ form {
     padding: 10px 20px;
     border: none;
     border-radius: 6px;
-    background-color: #121212; /* Dark background */
+    background-color: transparent; /* Dark background */
     color: #fff; /* White text */
     font-size: 14px;
     font-weight: 600;
@@ -307,7 +303,6 @@ form {
 
     /* Hover effect */
     .btn:hover {
-        background: #1a1a1a; /* Slightly lighter dark */
         transform: translateY(-2px); /* Slight lift effect */
     }
 
@@ -483,7 +478,7 @@ button {
 .pause-btn-2 {
     font-size: 4px;
     color: #fff;
-    padding:5px;
+    padding: 5px;
     height: 30px;
     margin: 4px;
     transition: transform 0.2s ease-in-out;
@@ -502,4 +497,9 @@ button {
     100% {
         transform: scaleX(1);
     }
+}
+
+.btn-danger {
+    border: solid 1px red;
+    color: red;
 }

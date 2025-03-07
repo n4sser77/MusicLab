@@ -118,6 +118,16 @@ public class BeatsService : IBeatsService
             beatToUpdate.AudioUrl = newBeat.AudioUrl;
         }
     }
+    public async Task<bool> DeleteLocalAudio(Beat beat)
+    {
+        string filePath = beat.AudioUrl;
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+            return true;
+        }
+        return false;
+    }
 
     public async Task<bool> PublishAudio(Beat beat, int userId)
     {

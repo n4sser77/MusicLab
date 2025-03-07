@@ -1,4 +1,5 @@
 ﻿@page "/EditBeat/"
+@using BlazorMaui.Components;
 @using BlazorMaui.Services.Interfaces
 @inject NavigationManager Navigation
 @inject IBeatsService BeatsService
@@ -22,20 +23,24 @@
 </div>
 
 
-<Button Onclick="() => SaveChanges()">
+<Button OnClick="() => SaveChanges()">
     @((isSaving != null) ? "Saving..." : "Save")
 </Button>
-<Button Onclick="async () => await PublishAudio()">
-    @((isSaving != null) ? "Publishing..." : "Publish")
+<Button OnClick="async () => await PublishAudio()">
+    @((publishMessage != null) ? "Publishing..." : "Publish")
+</Button>
+<Button onClick="async () => await TrigerDeleteWarning()" CssClass="btn-danger">
+    @((deleteMessage != null) ? "Are you sure?" : "Delete")
 </Button>
 <div class="h-50">
-    <span class="text-white-50 font-monospace"></span>
+    <span class="text-white-50 font-monospace">@deleteMessage</span>
 </div>
 @code {
     private Beat newBeat;
     private Beat oldBeat;
     private string? isSaving;
     private string? publishMessage;
+    private string? deleteMessage;
 
     protected override async void OnInitialized()
     {
@@ -59,6 +64,20 @@
         publishMessage = "Published successfully";
 
     }
+    private async Task TrigerDeleteWarning()
+    {
+        if (string.IsNullOrEmpty(deleteMessage))
+        {
+            deleteMessage = "Are you sure you want to delete this file? Click delete again";
+            return;
+        }
+
+        if (await BeatsService.DeleteLocalAudio(oldBeat))
+        {
+
+            Navigation.NavigateTo("/");
+        }
+    }
 
     private async Task SaveChanges()
     {
@@ -68,6 +87,6 @@
         await Task.Delay(400);
 
         BeatsService.UpdateAudio(newBeat, oldBeat);
-        Navigation.NavigateTo("/dashboard");
+        Navigation.NavigateTo("/");
     }
 }
