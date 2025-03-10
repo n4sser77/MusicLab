@@ -9,23 +9,20 @@ using CommunityToolkit.Mvvm.ComponentModel;
 public partial class Beat : ObservableObject
 {
     [ObservableProperty]
-    private Guid guid;
+    private int id;
     [ObservableProperty]
     private string title;
     [ObservableProperty]
-    private int bpm;
+    private int? bpm;
     [ObservableProperty]
-    public string genre;
+    public string? genre;
     [ObservableProperty]
-    public int plays;
+    public int? plays;
 
     [ObservableProperty]
     public string audioUrl;
 
-    public Beat()
-    {
-        guid = Guid.NewGuid();
-    }
+
 
 
 }

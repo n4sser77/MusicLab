@@ -48,23 +48,34 @@ namespace BlazorMaui
                 }
             }
         }
-        public async Task LoadAndStartAudio(string filePath)
+        public async Task LoadAndStartAudio(string filePath, bool stream = false)
         {
-            if (File.Exists(filePath))
+
+
+            // Stop and Reset Before Changing Source
+            mediaPlayer.Stop();
+            mediaPlayer.Source = null;
+            await Task.Delay(100); // Allow time for reset (prevents errors)
+
+            // Now Set the New Source and Play
+            mediaPlayer.ShouldAutoPlay = true;
+
+            if (stream = true)
+            {
+                mediaPlayer.Source = MediaSource.FromUri(filePath);
+            }
+            else
             {
 
-                // Stop and Reset Before Changing Source
-                mediaPlayer.Stop();
-                mediaPlayer.Source = null;
-                await Task.Delay(100); // Allow time for reset (prevents errors)
-
-                // Now Set the New Source and Play
-                mediaPlayer.ShouldAutoPlay = true;
                 mediaPlayer.Source = MediaSource.FromFile(filePath);
-                AudioSlider.Value = 0;
-
-                IsPlaying = true;
             }
+            AudioSlider.Value = 0;
+
+            IsPlaying = true;
+
+
+
+
         }
 
 

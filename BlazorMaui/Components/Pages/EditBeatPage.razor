@@ -32,6 +32,10 @@
 <Button onClick="async () => await TrigerDeleteWarning()" CssClass="btn-danger">
     @((deleteMessage != null) ? "Are you sure?" : "Delete")
 </Button>
+
+<Button onClick=" () => HandleCancel()">
+    Cancel
+</Button>
 <div class="h-50">
     <span class="text-white-50 font-monospace">@deleteMessage</span>
 </div>
@@ -88,5 +92,9 @@
 
         BeatsService.UpdateAudio(newBeat, oldBeat);
         Navigation.NavigateTo("/");
+    }
+    private async Task HandleCancel()
+    {
+        Navigation.NavigateTo("/mylibrary");
     }
 }

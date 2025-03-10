@@ -170,6 +170,7 @@ select {
     }
 
 
+
 .beat-table {
     width: 70%;
     padding: 15px;
@@ -482,11 +483,17 @@ button {
     height: 30px;
     margin: 4px;
     transition: transform 0.2s ease-in-out;
+    margin-left: auto;
 }
 
     .play-btn-2:hover,
     .pause-btn-2:hover {
         transform: scale(1.05);
+    }
+
+    .play-btn-2:active {
+        border-color: darkgray;
+        color: darkgray;
     }
 
 @keyframes progress-animation {

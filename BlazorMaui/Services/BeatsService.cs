@@ -1,6 +1,8 @@
-﻿using BlazorMaui.Helpers;
+﻿using BlazorMaui;
+using BlazorMaui.Helpers;
 using BlazorMaui.Services.Interfaces;
 using CommunityToolkit.Maui.Views;
+using System.IO;
 using Shared.Dtos;
 using System.Diagnostics;
 using System.Net.Http.Headers;
@@ -11,6 +13,7 @@ using System.Text.Json;
 public class BeatsService : IBeatsService
 {
     public List<Beat> UploadedAudio { get; set; } = new();
+    public List<Beat> UploadedAudioFromServer { get; set; } = new();
     string jsonFilePath = Path.Combine(FileSystem.AppDataDirectory, "audio_metadata.json");
 
 
@@ -19,13 +22,8 @@ public class BeatsService : IBeatsService
 
     public Beat FileToEdit { get; set; }
 
-
-
-
-
     public void LoadUploaded()
     {
-
 
         // Ensure JSON file exists
         if (!File.Exists(jsonFilePath))
@@ -127,6 +125,47 @@ public class BeatsService : IBeatsService
             return true;
         }
         return false;
+    }
+
+    public async Task StreamAudioFromServer(string filename)
+    {
+        string serverUrlLocalHost = "http://localhost:5106/api/audio/stream/" + filename;
+
+
+        await MainPage.Instance.LoadAndStartAudio(serverUrlLocalHost, stream: true);
+    }
+
+    public async Task GetAudioFromServer()
+    {
+        string serverUrlLocalHost = "http://localhost:5106/api/audio/getall";
+        using var client = new HttpClient();
+        try
+        {
+            var res = await client.GetAsync(serverUrlLocalHost);
+            var json = await res.Content.ReadAsStringAsync();
+            var filesMetadata = JsonSerializer.Deserialize<List<MusicMetadataDto>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if (filesMetadata == null || filesMetadata.Count == 0) return;
+            UploadedAudioFromServer.Clear();
+            foreach (var file in filesMetadata)
+            {
+                var b = new Beat
+                {
+                    Id = file.Id,
+                    Title = file.Title,
+                    Bpm = file.Bpm,
+                    Genre = file.Genre,
+                    AudioUrl = file.FilePath
+                };
+                UploadedAudioFromServer.Add(b);
+            }
+
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e.Message);
+            throw;
+        }
+
     }
 
     public async Task<bool> PublishAudio(Beat beat, int userId)
