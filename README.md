@@ -4,7 +4,7 @@
 
 **Currently Working:**
 
-*   **Local & Cloud Storage:**  Store your audio files both locally on your Windows machine and optionally on cloud storage.
+*   **Local & Cloud Storage:**  Store your audio files both locally on your Windows machine and on cloud storage.
 *   **Metadata Editing:** Edit metadata for your audio files. Metadata is stored:
     *   Locally as JSON files.
     *   On the server database when published.
