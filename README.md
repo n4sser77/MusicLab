@@ -20,3 +20,8 @@ This project is a Windows desktop application and is under active development. S
 
 ![MusicLab application showing published audio files streamed from the server](MusicLabDemoPictures/Screenshot_2025-03-11_135712.png)
 ![MusicLab application showing editing audio meta data](MusicLabDemoPictures/Screenshot_2025-03-11_143346.png)
+
+
+**Backend**
+*   **simplehttp:** was the initial backend written in a console app using HttpListner class, mostly for learning and understanding. Then ASP.NET was adopted then I switched to ASP.NET for scalability.
+*   **HttpServer:** is the active backend for the application that handles authentication, authorization, jwt token generation and validation. File proccessing from the client and streaming back to the client through REST apis
