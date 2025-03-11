@@ -19,3 +19,4 @@ This project is a Windows desktop application and is under active development. S
 ![MusicLab application showing local library](MusicLabDemoPictures/Screenshot_2025-03-11_135733.png)
 
 ![MusicLab application showing published audio files streamed from the server](MusicLabDemoPictures/Screenshot_2025-03-11_135712.png)
+![MusicLab application showing editing audio meta data](MusicLabDemoPictures/Screenshot_2025-03-11_143346.png)
