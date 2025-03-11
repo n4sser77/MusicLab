@@ -12,3 +12,10 @@
 *   **Audio Streaming (Published Files):** Stream your published audio files directly from the server without needing to download them.
 
 This project is a Windows desktop application and is under active development. Stay tuned for future updates and features!
+
+
+![MusicLab application showing home page](MusicLabDemoPictures/Screenshot 2025-03-11 135607.png)
+
+![MusicLab application showing local library](MusicLabDemoPictures/Screenshot 2025-03-11 135733.png)
+
+![MusicLab application showing published audio files streamed from the server](MusicLabDemoPictures/Screenshot 2025-03-11 135712.png)
