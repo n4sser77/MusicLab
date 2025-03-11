@@ -79,7 +79,7 @@
         if (await BeatsService.DeleteLocalAudio(oldBeat))
         {
 
-            Navigation.NavigateTo("/");
+            Navigation.NavigateTo("/mylibrary");
         }
     }
 
@@ -91,7 +91,7 @@
         await Task.Delay(400);
 
         BeatsService.UpdateAudio(newBeat, oldBeat);
-        Navigation.NavigateTo("/");
+        Navigation.NavigateTo("/mylibrary");
     }
     private async Task HandleCancel()
     {
