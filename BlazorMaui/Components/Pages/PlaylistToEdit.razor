@@ -1,0 +1,143 @@
+﻿@page "/playlist/"
+@using BlazorMaui.Models
+@using BlazorMaui.Services
+@using BlazorMaui.Services.Interfaces
+@inject IBeatsService beatsService
+@inject NavigationManager nav
+
+
+
+<h2>Playlist</h2>
+<input @bind="newPlaylist.Title" />
+
+@if (newPlaylist.Songs.Count == 0)
+{
+    <div class="text-white-50">This list is empty, add some songs</div>
+}
+
+@foreach (var song in newPlaylist.Songs)
+{
+    <div class="bg-dark">
+        <div id="container-body" class="card p-2  border-5 ">
+            <div class="card-title text-white ">
+                @song.Title
+            </div>
+            <div class="card-subtitle text-white-50 ">
+                @song.Genre
+                @song.Bpm Bpm
+            </div>
+            <div class="card-link">
+                <Button OnClick=" () =>RemoveFromList(song)" CssClass="m-1 btn-danger">Remove from list</Button>
+            </div>
+        </div>
+
+    </div>
+}
+
+<h3>Maybe add these songs</h3>
+
+@foreach (var item in beatsService.UploadedAudio)
+{
+    <div class="bg-dark">
+        <div id="container-body" class="card p-2  border-5 ">
+            <div class="card-title text-white ">
+                @item.Title
+            </div>
+            <div class="card-subtitle text-white-50 ">
+                @item.Genre
+                @item.Bpm Bpm
+            </div>
+            <div class="card-link">
+                <Button OnClick=" () =>AddToList(item)" CssClass="m-1 ">Add to list</Button>
+            </div>
+        </div>
+
+    </div>
+}
+
+<Button OnClick="()=> OnSave()">@(isSaving ? "Saving..." : "Save")</Button>
+<Button onClick="async () => await TrigerDeleteWarning()" CssClass="btn-danger">
+    @((deleteMessage != null) ? "Are you sure?" : "Delete")
+</Button>
+<Button onClick="async () => HandleCancel()" >
+    Cancel
+</Button>
+
+<div class="h-50">
+    <span class="text-white-50 font-monospace">@deleteMessage</span>
+</div>
+
+<style>
+
+    #container-body {
+    border-left-color: white;
+    color: white;
+    background-color: black;
+    }
+
+    #container-body:hover {
+    border-left-color: darkslateblue; /* Changes background color on hover */
+    color: white; /* Changes text color */
+    }
+</style>
+
+
+
+@code {
+    private IPlaylistService playlistService = PlaylistService.GetService();
+    private Playlist oldPlaylist;
+    private Playlist newPlaylist;
+    private bool isSaving;
+    private string? deleteMessage;
+
+    protected override void OnInitialized()
+    {
+        oldPlaylist = playlistService.PlaylistToEdit;
+        newPlaylist = oldPlaylist;
+    }
+
+    private async Task AddToList(Beat beat)
+    {
+        newPlaylist.Songs.Add(beat);
+    }
+
+    private async Task RemoveFromList(Beat beat)
+    {
+        newPlaylist.Songs.Remove(beat);
+    }
+    private async Task OnSave()
+    {
+        isSaving = true;
+        await Task.Delay(700);
+        playlistService.UpdatePlayList(oldPlaylist, newPlaylist);
+        isSaving = false;
+        nav.NavigateTo("/myplaylists");
+    }
+
+    private async Task TrigerDeleteWarning()
+    {
+        if (string.IsNullOrEmpty(deleteMessage))
+        {
+            deleteMessage = "Are you sure you want to delete this playlist? Click delete again";
+            return;
+        }
+
+        deleteMessage = "Deleting...";
+        var task = playlistService.DeletePlaylist(oldPlaylist);
+        await Task.Delay(400);
+        if(await task)
+            deleteMessage = "Deleted!";
+        else
+        {
+            deleteMessage = "failed to delete";
+        }
+        await Task.Delay(1000);
+        nav.NavigateTo("/myplaylists");
+
+    }
+
+    private async Task HandleCancel()
+    {
+        nav.NavigateTo("/myplaylists");
+    }
+}

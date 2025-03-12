@@ -15,12 +15,15 @@ public partial class Beat : ObservableObject
     [ObservableProperty]
     private int? bpm;
     [ObservableProperty]
-    public string? genre;
+    private string? genre;
     [ObservableProperty]
-    public int? plays;
+    private int? plays;
 
     [ObservableProperty]
-    public string audioUrl;
+    private bool isVisible;
+
+    [ObservableProperty]
+    private string audioUrl;
 
 
 

@@ -105,8 +105,14 @@ namespace BlazorMaui
 
         private async void OnAudioSliderValueChanged(object sender, ValueChangedEventArgs e)
         {
-            var (totalMin, seconds) = CalculateTotalSecoundsToMinutes(AudioSlider.Value);
-            var (totalMinDuration, secondsDuration) = CalculateTotalSecoundsToMinutes(AudioSlider.Maximum);
+
+            //<<<<<<< TODO: Unmerged change from project 'BlazorMaui (net9.0-ios)', Before:
+            //            var (totalMin, seconds) = CalculateTotalSecoundsToMinutes(AudioSlider.Value);
+            //            var (totalMinDuration, secondsDuration) = CalculateTotalSecoundsToMinutes(AudioSlider.Maximum);
+
+            var (totalMin, seconds) = DurationTimeHelper.CalculateTotalSecoundsToMinutes(AudioSlider.Value);
+            var (totalMinDuration, secondsDuration) = DurationTimeHelper.CalculateTotalSecoundsToMinutes(AudioSlider.Maximum);
+
 
             await Application.Current.Dispatcher.DispatchAsync(async () => DebugLabelSlider.Text = totalMin + ":" + seconds.ToString("00"));
             await Application.Current.Dispatcher.DispatchAsync(async () => DebugLabel.Text = totalMinDuration + ":" + secondsDuration.ToString("00"));
@@ -119,13 +125,6 @@ namespace BlazorMaui
             {
                 DebugLabel.Text = $"{(int)mediaPlayer.Position.TotalSeconds} of {(int)mediaPlayer.Duration.TotalSeconds} {sender.GetType()}";
                 DebugLabelSlider.Text = "Slider value: " + AudioSlider.Value + " Slider Length:" + AudioSlider.Maximum;
-            }
-
-            (int, int) CalculateTotalSecoundsToMinutes(double totalSecounds)
-            {
-                var totalMin = Math.Floor((totalSecounds / 60));
-                var remaingingSec = totalSecounds - totalMin * 60;
-                return ((int)totalMin, (int)remaingingSec);
             }
         }
 

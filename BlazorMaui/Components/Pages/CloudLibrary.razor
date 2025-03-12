@@ -12,12 +12,12 @@ Genre
     <option value="">All</option>
     @foreach (var genre in AvailableGenres)
     {
-        <option value="@genre">@genre</option>
+                    <option value="@genre">@genre</option>
     }
 </select>
 @if (isLoading)
 {
-    <div class="text-white-50">Loading...</div>
+                <div class="text-white-50">Loading...</div>
 }
 
 
@@ -26,19 +26,24 @@ Genre
 
 
     @* <AudioCard Beat="@beat" /> *@
-    <div class="audio-player">
+                <div class="audio-player">
         @* <div class="album-cover"></div> *@
-        <div class="player-controls">
-            <div class="song-info">
-                <div class="song-title"> @beat.Title</div>
-                @* <p class="artist">Artist</p> *@
-            </div>
-            <div class="buttons">
-                <button @onclick=" () => OnPlayBtnClick(beat.AudioUrl)" class="play-btn-2 "><svg viewBox="0 0 16 16" class="bi bi-play-fill" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg" style="color: white"> <path fill="white" d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"></path> </svg></button>
-                
-            </div>
-        </div>
-    </div>
+                    <div class="player-controls">
+                        <div class="song-info">
+                            <div class="song-title"> @beat.Title</div>
+                            <p class="artist">@beat.Genre @beat.Bpm Bpm</p>
+                        </div>
+                        @* <div class="progress-bar">
+
+                            <div class="progress" style="width: @((widthUnit == 0  && CompareMediaSoruce(beat)) ? 0 : widthUnit)% ;"></div>
+
+                        </div> *@
+                        <div class="buttons">
+                            <button @onclick=" () => OnPlayBtnClick(beat.AudioUrl)" class="play-btn-2 "><svg viewBox="0 0 16 16" class="bi bi-play-fill" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg" style="color: white"> <path fill="white" d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"></path> </svg></button>
+                        </div>
+
+                    </div>
+                </div>
 
 
 }
@@ -60,6 +65,7 @@ Genre
         MainPage.Instance.ShowAudioElement();
         MainPage.Instance.MediaEnded += OnAudioEnded;
         base.OnInitialized();
+        MainPage.Instance.MediaPlayer.PositionChanged += OnPositionChanged;
 
     }
     private bool isLoading;
@@ -82,8 +88,8 @@ Genre
     private IEnumerable<Beat> FilteredBeats =>
         isLoading ? new List<Beat>() :
         string.IsNullOrEmpty(selectedGenre)
-            ? BeatsService.UploadedAudioFromServer
-            : BeatsService.UploadedAudioFromServer.Where(b => b.Genre == selectedGenre);
+        ? BeatsService.UploadedAudioFromServer
+        : BeatsService.UploadedAudioFromServer.Where(b => b.Genre == selectedGenre);
 
     private void OnGenreChanged(ChangeEventArgs e)
     {
@@ -135,7 +141,24 @@ Genre
     }
 
 
+    private double AddWidth()
+    {
+        var totalSec = MainPage.Instance.MediaPlayer.Duration.TotalSeconds;
+        var widthUnit = totalSec / 100;
+        StateHasChanged();
+        return widthUnit;
+    }
+    private int widthUnit;
 
+    private void OnPositionChanged(object? sender, EventArgs e)
+    {
+        var totalSec = MainPage.Instance.MediaPlayer.Duration.TotalSeconds;
+        var currentSec = MainPage.Instance.MediaPlayer.Position.TotalSeconds;
+
+        widthUnit = (int)Math.Floor((currentSec / totalSec) * 100); // Update percentage
+
+        InvokeAsync(StateHasChanged); // Trigger re-render
+    }
 
 
 }
