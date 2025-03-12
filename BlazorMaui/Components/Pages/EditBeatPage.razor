@@ -33,9 +33,14 @@
     @((deleteMessage != null) ? "Are you sure?" : "Delete")
 </Button>
 
+<Button onclick="async () => await HandleVisibility()">
+    Toggle visibility:@(newBeat.IsVisible ? "public" : "private")
+</Button>
+
 <Button onClick=" () => HandleCancel()">
     Cancel
 </Button>
+
 <div class="h-50">
     <span class="text-white-50 font-monospace">@deleteMessage</span>
 </div>
@@ -96,5 +101,10 @@
     private async Task HandleCancel()
     {
         Navigation.NavigateTo("/mylibrary");
+    }
+
+    private async Task HandleVisibility()
+    {
+        newBeat.IsVisible = !newBeat.IsVisible;
     }
 }

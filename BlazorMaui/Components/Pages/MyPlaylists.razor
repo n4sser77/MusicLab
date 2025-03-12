@@ -1,0 +1,98 @@
+﻿@page "/myplaylists"
+
+@using BlazorMaui.Components
+@using BlazorMaui.Models
+@using BlazorMaui.Services
+@using BlazorMaui.Services.Interfaces
+
+
+@inject NavigationManager Navigation 
+
+@inject IBeatsService BeatsService 
+@inject IAuthService Auth 
+@* @inject IPlaylistService PlaylistService  *@
+
+<h3>Playlists</h3>
+<input @bind="newPlaylistName" @bind:event="oninput"/>
+<h3>@newPlaylistName</h3>
+<Button OnClick="() => CreatePlaylist()">Create Playlist</Button>
+<div class="d-flex flex-wrap">
+    @foreach (var playlist in playlistService.Playlists)
+    {
+
+
+        <a class="playlist-customlink card container-body border-3 m-m-lg-3"
+        @onclick="()=>GoToPlaylist(playlist)"
+        style="flex: 0 0 calc(50% - 2rem);">
+
+            <div class=" p-2 " >
+                <div class="card-title p-2 rounded-1 text-white" style="minimum-width: 10px;">@playlist.Title</div>
+            </div>
+        </a>
+
+    }
+</div> 
+<style>
+    .playlist-customlink {
+    text-decoration:inherit;
+    }
+
+    .playlist-customlink:hover {
+    cursor: pointer;
+    }
+
+    .container-body {
+    border-left-color: white;
+    color: white;
+    background-color: darkseagreen;
+    }
+
+    .container-body:hover {
+    border-left-color: darkslateblue; /* Changes background color on hover */
+    color: white; /* Changes text color */
+    }
+</style>
+
+@code {
+    List<Playlist> playlistsMock = new()
+    {
+    (new Playlist { Title = "Fate Decides" }),
+    (new Playlist { Title = "PureLux" }),
+    (new Playlist { Title = "The end of time" }),
+    (new Playlist { Title = "The beginning of time" }),
+    (new Playlist { Title = "Goodbye" }),
+    (new Playlist { Title = "Here we Are again" })
+    };
+
+    private IPlaylistService playlistService = PlaylistService.GetService();
+
+
+    private string newPlaylistName = "";
+
+    protected override async void OnInitialized()
+    {
+        await playlistService.LoadPlaylists();
+    }
+
+    private async Task CreatePlaylist()
+    {
+         if (string.IsNullOrEmpty(newPlaylistName)) return;
+        playlistService.CreatePlayList(newPlaylistName);
+        newPlaylistName = "";
+        // playlistsMock.Add(new Playlist { Title = newPlaylistName });
+        // newPlaylistName = "";
+
+    }
+    private async Task GoToPlaylist(Playlist playlist)
+    {
+        if (playlist is null)
+        {
+            throw new ArgumentNullException(nameof(playlist));
+        }
+
+        playlistService.PlaylistToEdit = playlist;
+        Navigation.NavigateTo($"/playlist");
+    }
+
+
+}

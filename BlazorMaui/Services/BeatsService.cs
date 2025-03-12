@@ -9,20 +9,26 @@ using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using BlazorMaui.Services;
 
 public class BeatsService : IBeatsService
 {
+
+    private readonly IAuthService _auth;
     public List<Beat> UploadedAudio { get; set; } = new();
     public List<Beat> UploadedAudioFromServer { get; set; } = new();
     string jsonFilePath = Path.Combine(FileSystem.AppDataDirectory, "audio_metadata.json");
 
-
+    public BeatsService(IAuthService auth)
+    {
+        _auth = auth;
+    }
 
     //public bool _isPlaying = false;
 
     public Beat FileToEdit { get; set; }
 
-    public void LoadUploaded()
+    public async void LoadUploaded()
     {
 
         // Ensure JSON file exists
@@ -64,7 +70,7 @@ public class BeatsService : IBeatsService
     }
 
 
-    public void UploadAudio(string fullpath, string title)
+    public async void UploadAudio(string fullpath, string title)
     {
         if (!UploadedAudio.Any(f => f.AudioUrl.Contains(fullpath)))
         {
@@ -77,7 +83,7 @@ public class BeatsService : IBeatsService
         }
     }
 
-    public void UpdateAudio(Beat newBeat, Beat oldBeat)
+    public async void UpdateAudio(Beat newBeat, Beat oldBeat)
     {
 
 
@@ -141,6 +147,9 @@ public class BeatsService : IBeatsService
         using var client = new HttpClient();
         try
         {
+            var token = await _auth.GetTokenAsync();
+            client.DefaultRequestHeaders.Authorization =
+            new AuthenticationHeaderValue("Bearer", token);
             var res = await client.GetAsync(serverUrlLocalHost);
             var json = await res.Content.ReadAsStringAsync();
             var filesMetadata = JsonSerializer.Deserialize<List<MusicMetadataDto>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -163,7 +172,7 @@ public class BeatsService : IBeatsService
         catch (Exception e)
         {
             Debug.WriteLine(e.Message);
-            throw;
+
         }
 
     }

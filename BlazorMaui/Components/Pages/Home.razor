@@ -12,8 +12,11 @@
 
 
 <h1 class="text-white">@(isAuthenticated ? "Welcome" : "Sign in or create an account")</h1>
-
-@if (isAuthenticated)
+@if (isLoading)
+{
+    <div>Loading...</div>
+}
+else if (isAuthenticated)
 {
     <p class="text-white-50">Logged in as @userEmail</p>
 
@@ -33,9 +36,10 @@ else
 }
 
 @code {
-    private bool isAuthenticated = false;
+    private bool isAuthenticated;
     private string message = "";
     private string userEmail = "";
+    private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -56,12 +60,15 @@ else
                 var user = JsonSerializer.Deserialize<User>(jsonResponse, options);
                 userEmail = user.Email;
                 AuthService.StoreUserId(user.Id);
+                isLoading = false;
             }
             catch (Exception e)
             {
                 message = e.Message;
+                isLoading = false;
 
             }
+            isLoading = false;
         }
     }
 

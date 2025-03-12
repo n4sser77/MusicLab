@@ -25,6 +25,7 @@ namespace BlazorMaui
 
             builder.Services.AddSingleton<IAuthService, AuthService>();
             builder.Services.AddSingleton<IBeatsService, BeatsService>();
+            //builder.Services.AddSingleton<IPlaylistService, PlaylistService>();
 
 
 
