@@ -12,26 +12,26 @@
 
 @if (newPlaylist.Songs.Count == 0)
 {
-                    <div class="text-white-50">This list is empty, add some songs</div>
+                        <div class="text-white-50">This list is empty, add some songs</div>
 }
 
 @foreach (var song in newPlaylist.Songs)
 {
-                    <div class="bg-dark">
-                        <div id="container-body" class="card p-2  border-5 ">
-                            <div class="card-title text-white ">
+                        <div class="bg-dark">
+                            <div id="container-body" class="card p-2  border-5 ">
+                                <div class="card-title text-white ">
                 @song.Title
-                            </div>
-                            <div class="card-subtitle text-white-50 ">
+                                </div>
+                                <div class="card-subtitle text-white-50 ">
                 @song.Genre
                 @song.Bpm Bpm
+                                </div>
+                                <div class="card-link">
+                                    <Button OnClick=" () =>RemoveFromList(song)" CssClass="m-1 btn-danger">Remove from list</Button>
+                                </div>
                             </div>
-                            <div class="card-link">
-                                <Button OnClick=" () =>RemoveFromList(song)" CssClass="m-1 btn-danger">Remove from list</Button>
-                            </div>
-                        </div>
 
-                    </div>
+                        </div>
 }
 
 <h3>Maybe add these songs</h3> <h6  class="p-2 pointer" @onclick="() => isHidden = !isHidden">@(isHidden ? "Show" : "Hide")</h6>
@@ -39,21 +39,21 @@
 @if (!isHidden)
     foreach (var item in beatsService.UploadedAudio)
     {
-                                    <div class="bg-dark">
-                                        <div id="container-body" class="card p-2  border-5 ">
-                                            <div class="card-title text-white ">
+                                            <div class="bg-dark">
+                                                <div id="container-body" class="card p-2  border-5 ">
+                                                    <div class="card-title text-white ">
                     @item.Title
-                                            </div>
-                                            <div class="card-subtitle text-white-50 ">
+                                                    </div>
+                                                    <div class="card-subtitle text-white-50 ">
                     @item.Genre
                     @item.Bpm Bpm
-                                            </div>
-                                            <div class="card-link">
-                                                <Button OnClick=" () =>AddToList(item)" CssClass="m-1 ">Add to list</Button>
-                                            </div>
-                                        </div>
+                                                    </div>
+                                                    <div class="card-link">
+                                                        <Button OnClick=" () =>AddToList(item)" CssClass="m-1 ">Add to list</Button>
+                                                    </div>
+                                                </div>
 
-                                    </div>
+                                            </div>
     } 
 
 
