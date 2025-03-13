@@ -15,11 +15,7 @@ public class PlaylistService : IPlaylistService
     public Playlist PlaylistToEdit { get; set; }
     private static readonly PlaylistService instance = new PlaylistService();
 
-    private PlaylistService()
-    {
-
-
-    }
+    private PlaylistService() { }
 
     public static PlaylistService GetService()
     {

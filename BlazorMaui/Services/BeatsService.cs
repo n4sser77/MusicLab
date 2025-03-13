@@ -31,7 +31,7 @@ public class BeatsService : IBeatsService
     public async void LoadUploaded()
     {
 
-        // Ensure JSON file exists
+        
         if (!File.Exists(jsonFilePath))
         {
             File.WriteAllText(jsonFilePath, "[]"); // Initialize empty JSON array
@@ -217,7 +217,7 @@ public class BeatsService : IBeatsService
         {
             Debug.WriteLine(e.Message);
             return false;
-            throw;
+            
         }
     }
 
