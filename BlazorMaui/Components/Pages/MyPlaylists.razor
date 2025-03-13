@@ -13,8 +13,8 @@
 @* @inject IPlaylistService PlaylistService  *@
 
 <h3>Playlists</h3>
-<input @bind="newPlaylistName" @bind:event="oninput"/>
-<h3>@newPlaylistName</h3>
+<input placeholder="New list title" style="background-color: rgb(0,10,12 , 0.75); color:rgb(252,253,255); font-weight:600;"  @bind="newPlaylistName" @bind:event="oninput"/>
+<h6>@newPlaylistName</h6>
 <Button OnClick="() => CreatePlaylist()">Create Playlist</Button>
 <div class="d-flex flex-wrap">
     @foreach (var playlist in playlistService.Playlists)
@@ -27,6 +27,7 @@
 
             <div class=" p-2 " >
                 <div class="card-title p-2 rounded-1 text-white" style="minimum-width: 10px;">@playlist.Title</div>
+                <div class="card-subtitle p-1 rounded-1 text-white-50 text-sm" style="minimum-width: 10px;"> @playlist.Songs.Count() songs</div>
             </div>
         </a>
 
@@ -44,7 +45,8 @@
     .container-body {
     border-left-color: white;
     color: white;
-    background-color: darkseagreen;
+    background-color: rgb(33,33,33, 0.4);
+    margin: 7px;
     }
 
     .container-body:hover {
