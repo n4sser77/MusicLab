@@ -12,6 +12,7 @@ using System.Text.Json;
 using BlazorMaui.Services;
 using NAudio.WaveFormRenderer;
 using NAudio.Wave;
+using System.Threading.Tasks;
 
 
 
@@ -192,6 +193,17 @@ public class BeatsService : IBeatsService
     public async Task StreamAudioFromServer(string filename)
     {
         string serverUrlLocalHost = "http://localhost:5106/api/audio/stream/" + filename;
+        var sw = new Stopwatch();
+        sw.Start();
+        var generateWaveTask = Task.Run(async () => GenerateWaveformImage(serverUrlLocalHost));
+        var loadAudioTask = MainPage.Instance.LoadAndStartAudio(serverUrlLocalHost, stream: true);
+        await Task.WhenAll(generateWaveTask);
+        sw.Stop();
+
+    }
+
+    private async Task GenerateWaveformImage(string serverUrlLocalHost)
+    {
 
         //  waveform settings for the renderer
         var myRendererSettings = new StandardWaveFormRendererSettings();
@@ -200,19 +212,11 @@ public class BeatsService : IBeatsService
         myRendererSettings.BottomHeight = 32;
         myRendererSettings.BackgroundColor = System.Drawing.Color.Transparent;
 
+
         var maxPeakProvider = new MaxPeakProvider();
-        var audioStream = new AudioFileReader(serverUrlLocalHost);
-
-
-
-
-
         var renderer = new WaveFormRenderer();
-
+        using var audioStream = new AudioFileReader(serverUrlLocalHost);
         var image = renderer.Render(audioStream, maxPeakProvider, myRendererSettings);
-
-
-
         using (MemoryStream ms = new MemoryStream())
         {
             image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
@@ -221,9 +225,8 @@ public class BeatsService : IBeatsService
             var f = UploadedAudioFromServer.FirstOrDefault(f => f.AudioUrl == Path.GetFileName(serverUrlLocalHost));
             f.WaveFormImageBase64 = imgBse64;
         }
+        image.Dispose();
 
-
-        await MainPage.Instance.LoadAndStartAudio(serverUrlLocalHost, stream: true);
     }
 
     public async Task GetAudioFromServer()

@@ -46,7 +46,7 @@ Genre
 
                 <!-- Progress waveform -->
                 <div class="waveform dynamic-waveform">
-                    <img src="data:image/bmp;base64,@beat.WaveFormImageBase64" />
+                    <img src="data:image/bmp;base64,@beat.WaveFormImageBase64" draggable="false" />
                 </div>
 
 
@@ -92,7 +92,7 @@ Genre
     /* Static waveform - on top */
     .static-waveform {
         background-color: transparent; /* Example background */
-        opacity:0.25;
+        opacity: 0.25;
         overflow: hidden;
         width: 100%;
     }
@@ -134,7 +134,8 @@ Genre
     private bool isLoading;
     private async Task OnPlayBtnClick(string file)
     {
-        await BeatsService.StreamAudioFromServer(Path.GetFileName(file));
+        BeatsService.StreamAudioFromServer(Path.GetFileName(file));
+
         var url = "http://localhost:5106/api/audio/stream/" + Path.GetFileName(file);
         InvokeAsync(StateHasChanged); // Trigger re-render
         // await JS.InvokeVoidAsync("loadWaveForm", url);
