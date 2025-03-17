@@ -15,6 +15,7 @@ namespace BlazorMaui
     {
         public static MainPage Instance { get; private set; }
         public MediaElement MediaPlayer => mediaPlayer;
+        public Slider AudioSlider => audioSlider;
         private bool isDraging = false;
         private TimeSpanToDoubleConverter timespanToDouble = new TimeSpanToDoubleConverter();
 

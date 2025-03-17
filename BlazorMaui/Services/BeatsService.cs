@@ -10,6 +10,10 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using BlazorMaui.Services;
+using NAudio.WaveFormRenderer;
+using NAudio.Wave;
+
+
 
 public class BeatsService : IBeatsService
 {
@@ -31,7 +35,7 @@ public class BeatsService : IBeatsService
     public async void LoadUploaded()
     {
 
-        
+
         if (!File.Exists(jsonFilePath))
         {
             File.WriteAllText(jsonFilePath, "[]"); // Initialize empty JSON array
@@ -57,11 +61,63 @@ public class BeatsService : IBeatsService
             if (!AudioConstants.SupportedAudioExtensions.Contains(extension))
                 continue; // Skip unsupported files
 
+
+
+            // read tags
+            var tFile = TagLib.File.Create(filePath);
+            var bpm = (int)tFile.Tag.BeatsPerMinute;
+            var sampleRate = tFile.Properties.AudioSampleRate;
+            var bitRate = tFile.Properties.AudioBitrate;
+            var duration = tFile.Properties.Duration;
+
+
             if (!UploadedAudio.Any(a => a.AudioUrl == filePath))
             {
                 string title = Path.GetFileNameWithoutExtension(filePath);
-                UploadedAudio.Add(new Beat { AudioUrl = filePath, Title = title });
+
+
+
+                UploadedAudio.Add(new Beat { AudioUrl = filePath, Title = title, Bpm = bpm });
+
             }
+
+            //  waveform settings for the renderer
+            var myRendererSettings = new StandardWaveFormRendererSettings();
+            myRendererSettings.Width = 640;
+            myRendererSettings.TopHeight = 32;
+            myRendererSettings.BottomHeight = 32;
+            myRendererSettings.BackgroundColor = System.Drawing.Color.Transparent;
+
+            var maxPeakProvider = new MaxPeakProvider();
+            var audioStream = new AudioFileReader(filePath);
+
+
+
+
+
+            var renderer = new WaveFormRenderer();
+
+            var image = renderer.Render(audioStream, maxPeakProvider, myRendererSettings);
+
+
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                var imageBytes = ms.ToArray();
+                var imgBse64 = System.Convert.ToBase64String(imageBytes);
+                var f = UploadedAudio.FirstOrDefault(f => f.AudioUrl == filePath);
+                f.WaveFormImageBase64 = imgBse64;
+            }
+
+
+            if (bpm != 0)
+            {
+                var file = UploadedAudio.FirstOrDefault(f => f.AudioUrl == filePath);
+                file.Bpm = bpm;
+            }
+
+
         }
 
 
@@ -137,6 +193,35 @@ public class BeatsService : IBeatsService
     {
         string serverUrlLocalHost = "http://localhost:5106/api/audio/stream/" + filename;
 
+        //  waveform settings for the renderer
+        var myRendererSettings = new StandardWaveFormRendererSettings();
+        myRendererSettings.Width = 710;
+        myRendererSettings.TopHeight = 32;
+        myRendererSettings.BottomHeight = 32;
+        myRendererSettings.BackgroundColor = System.Drawing.Color.Transparent;
+
+        var maxPeakProvider = new MaxPeakProvider();
+        var audioStream = new AudioFileReader(serverUrlLocalHost);
+
+
+
+
+
+        var renderer = new WaveFormRenderer();
+
+        var image = renderer.Render(audioStream, maxPeakProvider, myRendererSettings);
+
+
+
+        using (MemoryStream ms = new MemoryStream())
+        {
+            image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            var imageBytes = ms.ToArray();
+            var imgBse64 = System.Convert.ToBase64String(imageBytes);
+            var f = UploadedAudioFromServer.FirstOrDefault(f => f.AudioUrl == Path.GetFileName(serverUrlLocalHost));
+            f.WaveFormImageBase64 = imgBse64;
+        }
+
 
         await MainPage.Instance.LoadAndStartAudio(serverUrlLocalHost, stream: true);
     }
@@ -157,6 +242,7 @@ public class BeatsService : IBeatsService
             UploadedAudioFromServer.Clear();
             foreach (var file in filesMetadata)
             {
+
                 var b = new Beat
                 {
                     Id = file.Id,
@@ -217,7 +303,7 @@ public class BeatsService : IBeatsService
         {
             Debug.WriteLine(e.Message);
             return false;
-            
+
         }
     }
 

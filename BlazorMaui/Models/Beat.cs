@@ -24,6 +24,8 @@ public partial class Beat : ObservableObject
 
     [ObservableProperty]
     private string audioUrl;
+    [ObservableProperty]
+    private string waveFormImageBase64;
 
 
 

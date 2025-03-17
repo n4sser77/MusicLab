@@ -2,11 +2,14 @@
 using CommunityToolkit.Maui;
 using BlazorMaui.Services.Interfaces;
 using BlazorMaui.Services;
+using BlazorMaui.Repositories;
+using BlazorMaui.Repositories.Interfaces;
 
 namespace BlazorMaui
 {
     public static class MauiProgram
     {
+        public static  IServiceProvider ServiceProvider;
         public static MauiApp CreateMauiApp()
         {
             var builder = MauiApp.CreateBuilder();
@@ -26,9 +29,10 @@ namespace BlazorMaui
             builder.Services.AddSingleton<IAuthService, AuthService>();
             builder.Services.AddSingleton<IBeatsService, BeatsService>();
             //builder.Services.AddSingleton<IPlaylistService, PlaylistService>();
+            builder.Services.AddTransient<IPlaylistRepository, PlaylistRepository>();
 
-
-
+            
+            ServiceProvider = builder.Services.BuildServiceProvider();
 
 
 #if DEBUG

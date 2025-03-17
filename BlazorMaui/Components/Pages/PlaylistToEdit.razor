@@ -96,7 +96,7 @@
 
 
 @code {
-    private IPlaylistService playlistService = PlaylistService.GetService();
+    private IPlaylistService playlistService = PlaylistServiceFromRepository.GetService();
     private Playlist oldPlaylist;
     private Playlist newPlaylist;
     private bool isSaving;

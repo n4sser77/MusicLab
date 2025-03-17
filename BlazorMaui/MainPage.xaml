@@ -32,7 +32,7 @@
 
         <Grid HorizontalOptions="Center" VerticalOptions="End"  Grid.Row="1" RowDefinitions="auto,auto,auto" x:Name="AudioContainer">
             <Slider 
-            x:Name="AudioSlider" 
+            x:Name="audioSlider" 
             Grid.Row="0" 
             VerticalOptions="Center" 
             HorizontalOptions="Center" 

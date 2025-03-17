@@ -12,12 +12,12 @@ Genre
     <option value="">All</option>
     @foreach (var genre in AvailableGenres)
     {
-                    <option value="@genre">@genre</option>
+        <option value="@genre">@genre</option>
     }
 </select>
 @if (isLoading)
 {
-                <div class="text-white-50">Loading...</div>
+    <div class="text-white-50">Loading...</div>
 }
 
 
@@ -26,30 +26,89 @@ Genre
 
 
     @* <AudioCard Beat="@beat" /> *@
-                <div class="audio-player">
+    <div class="audio-player">
         @* <div class="album-cover"></div> *@
-                    <div class="player-controls">
-                        <div class="song-info">
-                            <div class="song-title"> @beat.Title</div>
-                            <p class="artist">@beat.Genre @beat.Bpm Bpm</p>
-                        </div>
-                        @* <div class="progress-bar">
+        <div class="player-controls">
+            <div class="song-info">
+                <div class="song-title"> @beat.Title</div>
+                <p class="artist">@beat.Genre @beat.Bpm Bpm</p>
+            </div>
+            <div class=" waveform-container">
 
-                            <div class="progress" style="width: @((widthUnit == 0  && CompareMediaSoruce(beat)) ? 0 : widthUnit)% ;"></div>
+                @* <div class="progress" style="width: @((widthUnit == 0  && CompareMediaSoruce(beat)) ? 0 : widthUnit)% ;"></div> *@
 
-                        </div> *@
-                        <div class="buttons">
-                            <button @onclick=" () => OnPlayBtnClick(beat.AudioUrl)" class="play-btn-2 "><svg viewBox="0 0 16 16" class="bi bi-play-fill" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg" style="color: white"> <path fill="white" d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"></path> </svg></button>
-                        </div>
 
-                    </div>
+                <!-- static waveform -->
+                <div class="waveform static-waveform">
+
+                    <img src="data:image/bmp;base64,@beat.WaveFormImageBase64" draggable="false" />
                 </div>
+
+                <!-- Progress waveform -->
+                <div class="waveform dynamic-waveform">
+                    <img src="data:image/bmp;base64,@beat.WaveFormImageBase64" />
+                </div>
+
+
+            </div>
+
+            @* <input ref="slider" type="range" min="0" max="@waveformWidth" value="@widthUnit" @oninput="OnSliderChanged" class="waveform-slider" /> *@
+
+
+        </div>
+
+
+        <div class="buttons">
+            <button @onclick=" async () => await OnPlayBtnClick(beat.AudioUrl)" class="play-btn-2 "><svg viewBox="0 0 16 16" class="bi bi-play-fill" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg" style="color: white"> <path fill="white" d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"></path> </svg></button>
+        </div>
+
+    </div>
+
 
 
 }
 
+<style>
+    .waveform-container {
+        position: relative;
+        width: 100%;
+        height: 120px; /* Increased height to fit both waveforms */
+        border: 3px solid: rgb(33,33,33, 0.7);
+        position: relative; /* Makes child `absolute` elements position relative to this */
 
+        display: flex;
+        flex-direction: column; /* Stack waveforms vertically */
+        overflow: hidden;
+        align-items: flex-start;
+    }
 
+    /* Waveform elements */
+    .waveform {
+        width: 100%;
+        height: 70%; /* Each waveform takes half the container */
+        overflow: hidden;
+    }
+
+    /* Static waveform - on top */
+    .static-waveform {
+        background-color: transparent; /* Example background */
+        opacity:0.25;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    /* Dynamic waveform - below */
+    .dynamic-waveform {
+        position: absolute; /* Overlays are stacked over the base */
+        display: flex;
+        justify-content: start; /* Align content in flex manner */
+        align-items: flex-start;
+        background-color: transparent; /* Example background */
+        overflow: hidden;
+        width: @(widthUnit + "px");
+    }
+
+</style>
 
 
 
@@ -59,22 +118,29 @@ Genre
 
         // BeatsService.LoadUploaded();
         isLoading = true;
-        await BeatsService.GetAudioFromServer();
-        isLoading = false;
-        StateHasChanged();
+        var task = BeatsService.GetAudioFromServer();
         MainPage.Instance.ShowAudioElement();
         MainPage.Instance.MediaEnded += OnAudioEnded;
         base.OnInitialized();
-        MainPage.Instance.MediaPlayer.PositionChanged += OnPositionChanged;
+        MainPage.Instance.AudioSlider.ValueChanged += OnPositionChanged;
+        await task;
+        isLoading = false;
+        InvokeAsync(StateHasChanged); // Trigger re-render
 
     }
+
+    private int wavePos = 0;
+
     private bool isLoading;
-    private async void OnPlayBtnClick(string file)
+    private async Task OnPlayBtnClick(string file)
     {
         await BeatsService.StreamAudioFromServer(Path.GetFileName(file));
+        var url = "http://localhost:5106/api/audio/stream/" + Path.GetFileName(file);
+        InvokeAsync(StateHasChanged); // Trigger re-render
+        // await JS.InvokeVoidAsync("loadWaveForm", url);
     }
 
-    private void OnAudioEnded()
+    private async void OnAudioEnded()
     {
         // Called when audio finishes
         InvokeAsync(StateHasChanged);
@@ -91,11 +157,11 @@ Genre
         ? BeatsService.UploadedAudioFromServer
         : BeatsService.UploadedAudioFromServer.Where(b => b.Genre == selectedGenre);
 
-    private void OnGenreChanged(ChangeEventArgs e)
+    private async void OnGenreChanged(ChangeEventArgs e)
     {
         selectedGenre = e.Value?.ToString() ?? "";
         // Force re-render
-        StateHasChanged();
+        InvokeAsync(StateHasChanged); // Trigger re-render
     }
 
     public bool ReRender;
@@ -143,22 +209,28 @@ Genre
 
     private double AddWidth()
     {
-        var totalSec = MainPage.Instance.MediaPlayer.Duration.TotalSeconds;
-        var widthUnit = totalSec / 100;
+        var totalms = MainPage.Instance.MediaPlayer.Duration.TotalMilliseconds;
+        var widthUnit = totalms / waveformWidth;
         StateHasChanged();
         return widthUnit;
     }
     private int widthUnit;
+    private int waveformWidth = 710;
 
-    private void OnPositionChanged(object? sender, EventArgs e)
+    private async void OnPositionChanged(object? sender, EventArgs e)
     {
-        var totalSec = MainPage.Instance.MediaPlayer.Duration.TotalSeconds;
-        var currentSec = MainPage.Instance.MediaPlayer.Position.TotalSeconds;
+        var totalms = MainPage.Instance.AudioSlider.Maximum;
+        if (totalms <= 0) return; // Prevent division by zero
 
-        widthUnit = (int)Math.Floor((currentSec / totalSec) * 100); // Update percentage
+        var currentms = MainPage.Instance.AudioSlider.Value;
+        widthUnit = (int)Math.Floor((currentms / totalms) * waveformWidth);
 
-        InvokeAsync(StateHasChanged); // Trigger re-render
+
+        await InvokeAsync(StateHasChanged); // Trigger re-render
     }
+
+
+
 
 
 }

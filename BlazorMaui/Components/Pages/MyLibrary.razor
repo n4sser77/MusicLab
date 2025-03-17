@@ -46,6 +46,8 @@
                     <td>@beat.Genre</td>
                     <td>@beat.Plays</td>
                     <td>
+
+
                         <Button OnClick=" () => HandlePlayBtn(beat.AudioUrl)">
                             @(currentTrack == beat.AudioUrl && MainPage.Instance.IsPlaying ? "⏸ Pause" : "▶ Play")
                         </Button>
@@ -54,12 +56,15 @@
                         </Button>
                     </td>
                 </tr>
+                
+
             }
         </tbody>
     </table>
 </div>
 
 <Button OnClick=" () => PickFiles()">Pick Files</Button>
+
 
 
 
@@ -154,7 +159,7 @@
         }
     }
 
-    
+
 
     private void HandleEditBtn(Beat beat)
     {
@@ -167,6 +172,7 @@
     private double Duration { get; set; } = 100; // Default, updated later
 
 
+    
 
 
 

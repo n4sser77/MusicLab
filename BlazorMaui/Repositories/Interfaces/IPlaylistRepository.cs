@@ -11,8 +11,9 @@ namespace BlazorMaui.Repositories.Interfaces
     {
         Task CreatePlaylistAsync(string title);
         Task<IEnumerable<Playlist>> GetPlaylistsAsync();
-        Task SavePlaylistsAsync(List<Playlist> playlists);
-
+        Task UpdatePlaylistsAsync(Playlist oldPlaylist, Playlist newPlaylist);
+        Task AddSongToPlaylist(Playlist playlist, Beat song);
+        Task RemoveSongFromPlaylist(Playlist playlist, Beat song);
         Task DeletePlaylistAsync(Playlist playlist);
 
 

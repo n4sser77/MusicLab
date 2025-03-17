@@ -66,7 +66,7 @@
     (new Playlist { Title = "Here we Are again" })
     };
 
-    private IPlaylistService playlistService = PlaylistService.GetService();
+    private IPlaylistService playlistService = PlaylistServiceFromRepository.GetService();
 
 
     private string newPlaylistName = "";
@@ -79,7 +79,7 @@
     private async Task CreatePlaylist()
     {
          if (string.IsNullOrEmpty(newPlaylistName)) return;
-        playlistService.CreatePlayList(newPlaylistName);
+        await playlistService.CreatePlayList(newPlaylistName);
         newPlaylistName = "";
         // playlistsMock.Add(new Playlist { Title = newPlaylistName });
         // newPlaylistName = "";
