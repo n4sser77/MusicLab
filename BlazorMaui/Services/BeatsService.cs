@@ -202,7 +202,7 @@ public class BeatsService : IBeatsService
 
     }
 
-    private async Task GenerateWaveformImage(string serverUrlLocalHost)
+    private async Task GenerateWaveformImage(string filepath)
     {
 
         //  waveform settings for the renderer
@@ -215,14 +215,14 @@ public class BeatsService : IBeatsService
 
         var maxPeakProvider = new MaxPeakProvider();
         var renderer = new WaveFormRenderer();
-        using var audioStream = new AudioFileReader(serverUrlLocalHost);
+        using var audioStream = new AudioFileReader(filepath);
         var image = renderer.Render(audioStream, maxPeakProvider, myRendererSettings);
         using (MemoryStream ms = new MemoryStream())
         {
             image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
             var imageBytes = ms.ToArray();
             var imgBse64 = System.Convert.ToBase64String(imageBytes);
-            var f = UploadedAudioFromServer.FirstOrDefault(f => f.AudioUrl == Path.GetFileName(serverUrlLocalHost));
+            var f = UploadedAudioFromServer.FirstOrDefault(f => f.AudioUrl == Path.GetFileName(filepath));
             f.WaveFormImageBase64 = imgBse64;
         }
         image.Dispose();

@@ -22,6 +22,24 @@ else if (isAuthenticated)
 
     <button @onclick="Logout">Logout</button>
 
+    <div class="d-flex flex-wrap">
+        @foreach (var tab in tabs)
+        {
+
+
+            <a class="playlist-customlink card container-body border-3 m-m-lg-3"
+            @onclick="()=>GoToTab(tab)"
+            style="flex: 0 0 calc(50% - 2rem);">
+
+                <div class=" p-2 ">
+                    <div class="card-title p-2 rounded-1 text-white" style="minimum-width: 10px;">@tab.Title</div>
+                    <div class="card-subtitle p-1 rounded-1 text-white-50 text-sm" style="minimum-width: 10px;"> click see more</div>
+                </div>
+            </a>
+
+        }
+    </div>
+
 }
 else
 {
@@ -35,11 +53,63 @@ else
     </div>
 }
 
+
+
+<style>
+    .playlist-customlink {
+        text-decoration: inherit;
+    }
+
+        .playlist-customlink:hover {
+            cursor: pointer;
+        }
+
+    .container-body {
+        border-left-color: white;
+        color: white;
+        background-color: rgb(33,33,33, 0.4);
+        margin: 7px;
+    }
+
+        .container-body:hover {
+            border-left-color: darkslateblue; /* Changes background color on hover */
+            color: white; /* Changes text color */
+        }
+</style>
 @code {
     private bool isAuthenticated;
     private string message = "";
     private string userEmail = "";
     private bool isLoading = true;
+    private List<Link> tabs = new()
+    {
+        new Link
+        {
+            Title="My local library",
+            Path="/mylibrary"
+        },
+        new Link
+        {
+            Title="My cloud library",
+            Path="/cloudlibrary"
+        },
+        new Link
+        {
+            Title="My playlists",
+            Path="MyPlaylists"
+        }
+    };
+
+    class Link
+    {
+        public string Title { get; set; }
+        public string Path { get; set; }
+    }
+
+    private async Task GoToTab(Link tab)
+    {
+        Navigation.NavigateTo(tab.Path);
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -69,7 +139,7 @@ else
 
             }
         }
-            isLoading = false;
+        isLoading = false;
     }
 
     private async Task GoToLogin()
