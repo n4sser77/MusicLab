@@ -22,6 +22,10 @@ public class BeatsService : IBeatsService
     private readonly IAuthService _auth;
     public List<Beat> UploadedAudio { get; set; } = new();
     public List<Beat> UploadedAudioFromServer { get; set; } = new();
+
+
+
+
     string jsonFilePath = Path.Combine(FileSystem.AppDataDirectory, "audio_metadata.json");
 
     public BeatsService(IAuthService auth)
@@ -31,9 +35,9 @@ public class BeatsService : IBeatsService
 
     //public bool _isPlaying = false;
 
-    public Beat FileToEdit { get; set; }
+    public Beat? FileToEdit { get; set; }
 
-    public async void LoadUploaded()
+    public async Task LoadUploaded()
     {
 
 
@@ -82,35 +86,6 @@ public class BeatsService : IBeatsService
 
             }
 
-            //  waveform settings for the renderer
-            var myRendererSettings = new StandardWaveFormRendererSettings();
-            myRendererSettings.Width = 640;
-            myRendererSettings.TopHeight = 32;
-            myRendererSettings.BottomHeight = 32;
-            myRendererSettings.BackgroundColor = System.Drawing.Color.Transparent;
-
-            var maxPeakProvider = new MaxPeakProvider();
-            var audioStream = new AudioFileReader(filePath);
-
-
-
-
-
-            var renderer = new WaveFormRenderer();
-
-            var image = renderer.Render(audioStream, maxPeakProvider, myRendererSettings);
-
-
-
-            using (MemoryStream ms = new MemoryStream())
-            {
-                image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                var imageBytes = ms.ToArray();
-                var imgBse64 = System.Convert.ToBase64String(imageBytes);
-                var f = UploadedAudio.FirstOrDefault(f => f.AudioUrl == filePath);
-                f.WaveFormImageBase64 = imgBse64;
-            }
-
 
             if (bpm != 0)
             {
@@ -127,7 +102,7 @@ public class BeatsService : IBeatsService
     }
 
 
-    public async void UploadAudio(string fullpath, string title)
+    public async Task UploadAudio(string fullpath, string title)
     {
         if (!UploadedAudio.Any(f => f.AudioUrl.Contains(fullpath)))
         {
@@ -140,7 +115,7 @@ public class BeatsService : IBeatsService
         }
     }
 
-    public async void UpdateAudio(Beat newBeat, Beat oldBeat)
+    public async Task UpdateAudio(Beat newBeat, Beat oldBeat)
     {
 
 
@@ -195,9 +170,9 @@ public class BeatsService : IBeatsService
         string serverUrlLocalHost = "http://localhost:5106/api/audio/stream/" + filename;
         var sw = new Stopwatch();
         sw.Start();
-        var generateWaveTask = Task.Run(async () => GenerateWaveformImage(serverUrlLocalHost));
+        //var generateWaveTask = Task.Run(async () => GenerateWaveformImage(serverUrlLocalHost));
         var loadAudioTask = MainPage.Instance.LoadAndStartAudio(serverUrlLocalHost, stream: true);
-        await Task.WhenAll(generateWaveTask);
+        //await Task.WhenAll(generateWaveTask);
         sw.Stop();
 
     }
@@ -231,6 +206,7 @@ public class BeatsService : IBeatsService
 
     public async Task GetAudioFromServer()
     {
+
         string serverUrlLocalHost = "http://localhost:5106/api/audio/getall";
         using var client = new HttpClient();
         try
@@ -242,7 +218,8 @@ public class BeatsService : IBeatsService
             var json = await res.Content.ReadAsStringAsync();
             var filesMetadata = JsonSerializer.Deserialize<List<MusicMetadataDto>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             if (filesMetadata == null || filesMetadata.Count == 0) return;
-            UploadedAudioFromServer.Clear();
+
+            List<Beat> newData = new();
             foreach (var file in filesMetadata)
             {
 
@@ -252,11 +229,13 @@ public class BeatsService : IBeatsService
                     Title = file.Title,
                     Bpm = file.Bpm,
                     Genre = file.Genre,
-                    AudioUrl = file.FilePath
+                    AudioUrl = file.FilePath,
+                    WaveFormImageBase64 = file.WaveFormImageBase64
                 };
-                UploadedAudioFromServer.Add(b);
+                //UploadedAudioFromServer.Add(b);
+                newData.Add(b);
             }
-
+            UploadedAudioFromServer = newData;
         }
         catch (Exception e)
         {

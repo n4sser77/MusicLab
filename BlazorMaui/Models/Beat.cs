@@ -19,6 +19,8 @@ public partial class Beat : ObservableObject
     [ObservableProperty]
     private int? plays;
 
+    
+
     [ObservableProperty]
     private bool isVisible;
 

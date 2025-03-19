@@ -1,6 +1,11 @@
-﻿@page "/EditBeat/"
+﻿@page "/EditBeat/{Id:int?}"
 @using BlazorMaui.Components;
 @using BlazorMaui.Services.Interfaces
+@using System.Diagnostics
+@using System.Net.Http.Headers
+@using Shared.Dtos
+@using System.Text.Json
+@using System.Text
 @inject NavigationManager Navigation
 @inject IBeatsService BeatsService
 @inject IAuthService Auth
@@ -51,9 +56,16 @@
     private string? publishMessage;
     private string? deleteMessage;
 
+    [Parameter]
+    public int? Id { get; set; }
+
+
+
     protected override async void OnInitialized()
     {
-        newBeat = BeatsService.FileToEdit;
+
+        newBeat = BeatsService.FileToEdit == null ? BeatsService.UploadedAudioFromServer.FirstOrDefault(a => a.Id == Id)
+        : BeatsService.FileToEdit;
         oldBeat = newBeat;
 
     }
@@ -81,6 +93,14 @@
             return;
         }
 
+        if (BeatsService.FileToEdit == null)
+        {
+            await DeleteBeatFromCloud(newBeat.Id);
+            Navigation.NavigateTo("/cloudlibrary");
+            return;
+        }
+
+
         if (await BeatsService.DeleteLocalAudio(oldBeat))
         {
 
@@ -94,13 +114,82 @@
         isSaving = "Saving...";
         StateHasChanged();
         await Task.Delay(400);
-
+        if (BeatsService.FileToEdit == null)
+        {
+            await UpdateBeatToCloud(newBeat.Id);
+            Navigation.NavigateTo("cloudlibrary");
+            return;
+        }
         BeatsService.UpdateAudio(newBeat, oldBeat);
         Navigation.NavigateTo("/mylibrary");
+        BeatsService.FileToEdit = null;
     }
     private async Task HandleCancel()
     {
-        Navigation.NavigateTo("/mylibrary");
+        if (BeatsService.FileToEdit != null) Navigation.NavigateTo("/mylibrary");
+        else Navigation.NavigateTo("cloudlibrary");
+
+    }
+    private async Task DeleteBeatFromCloud(int id)
+    {
+        string serverUrlLocalHost = "http://localhost:5106/api/audio/delete/" + id;
+        HttpClient client = new HttpClient();
+        try
+        {
+            var token = await Auth.GetTokenAsync();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var res = await client.DeleteAsync(serverUrlLocalHost);
+            if (res.IsSuccessStatusCode) return;
+
+        }
+        catch (Exception e)
+        {
+
+            Debug.WriteLine(e.Message);
+
+        }
+    }
+    private async Task UpdateBeatToCloud(int id)
+    {
+        string serverUrlLocalHost = "http://localhost:5106/api/audio/update/" + id;
+        HttpClient client = new HttpClient();
+        try
+        {
+            var token = await Auth.GetTokenAsync();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var beatData = new MusicMetadataDto()
+                {
+                    Title = newBeat.Title,
+                    Bpm = newBeat.Bpm,
+                    Genre = newBeat.Genre,
+                    FilePath = newBeat.AudioUrl,
+                    Id = newBeat.Id,
+
+
+                };
+            var jsonBody = JsonSerializer.Serialize(beatData);
+
+            var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await client.PutAsync(serverUrlLocalHost, content);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Debug.WriteLine("Success");
+                Navigation.NavigateTo("/cloudlibrary");
+            }
+            else
+            {
+                Debug.WriteLine("Failed");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.WriteLine(e.Message);
+
+        }
+
     }
 
     private async Task HandleVisibility()

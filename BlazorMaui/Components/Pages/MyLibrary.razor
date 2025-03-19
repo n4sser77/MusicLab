@@ -8,12 +8,12 @@
 
 @if (selectedFiles?.Any() == true)
 {
-    <ul>
+        <ul>
         @foreach (var file in selectedFiles)
         {
-            <li>@file.FileName</li>
+                    <li>@file.FileName</li>
         }
-    </ul>
+        </ul>
 }
 
 <div class="table-container">
@@ -28,7 +28,7 @@
                         <option value="">All</option>
                         @foreach (var genre in AvailableGenres)
                         {
-                            <option value="@genre">@genre</option>
+                                <option value="@genre">@genre</option>
                         }
                     </select>
 
@@ -40,23 +40,23 @@
         <tbody>
             @foreach (var beat in FilteredBeats)
             {
-                <tr>
-                    <td>@beat.Title</td>
-                    <td>@beat.Bpm</td>
-                    <td>@beat.Genre</td>
-                    <td>@beat.Plays</td>
-                    <td>
+                    <tr>
+                        <td>@beat.Title</td>
+                        <td>@beat.Bpm</td>
+                        <td>@beat.Genre</td>
+                        <td>@beat.Plays</td>
+                        <td>
 
 
-                        <Button OnClick=" () => HandlePlayBtn(beat.AudioUrl)">
+                            <Button OnClick=" () => HandlePlayBtn(beat.AudioUrl)">
                             @(currentTrack == beat.AudioUrl && MainPage.Instance.IsPlaying ? "⏸ Pause" : "▶ Play")
-                        </Button>
-                        <Button OnClick=" () => HandleEditBtn(beat)">
-                            Edit
-                        </Button>
-                    </td>
-                </tr>
-                
+                            </Button>
+                            <Button OnClick=" () => HandleEditBtn(beat)">
+                                Edit
+                            </Button>
+                        </td>
+                    </tr>
+
 
             }
         </tbody>
@@ -70,13 +70,26 @@
 
 
 @code {
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+         base.OnInitializedAsync();
+        // Immediately trigger UI render
+        // InvokeAsync(StateHasChanged);
+
+        // Load beats in the background (no blocking UI)
+        _ = Task.Run(async () =>
+        {
+            await BeatsService.LoadUploaded();
+            InvokeAsync(StateHasChanged); // Update UI after loading
+        });
         MainPage.Instance.ShowAudioElement();
-        BeatsService.LoadUploaded();
         MainPage.Instance.MediaEnded += OnAudioEnded;
+
+        
+        InvokeAsync(StateHasChanged); // Trigger re-render
     }
+
+
 
     private void OnAudioEnded()
     {
@@ -167,12 +180,8 @@
         Navigation.NavigateTo("/EditBeat");
     }
 
-    private ElementReference audioPlayer;
-    private double CurrentPosition { get; set; } = 0;
-    private double Duration { get; set; } = 100; // Default, updated later
 
 
-    
 
 
 
