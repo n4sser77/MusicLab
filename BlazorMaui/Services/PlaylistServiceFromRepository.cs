@@ -38,6 +38,7 @@ public class PlaylistServiceFromRepository : IPlaylistService
     public async Task CreatePlayList(string title)
     {
         await _playlistRepository.CreatePlaylistAsync(title);
+        LoadPlaylists();
     }
 
 

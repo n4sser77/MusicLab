@@ -21,15 +21,15 @@
     {
 
 
-        <a class="playlist-customlink card container-body border-3 m-m-lg-3"
-        @onclick="()=>GoToPlaylist(playlist)"
-        style="flex: 0 0 calc(50% - 2rem);">
+            <a class="playlist-customlink card container-body border-3 m-m-lg-3"
+            @onclick="()=>GoToPlaylist(playlist)"
+            style="flex: 0 0 calc(50% - 2rem);">
 
-            <div class=" p-2 " >
-                <div class="card-title p-2 rounded-1 text-white" style="minimum-width: 10px;">@playlist.Title</div>
-                <div class="card-subtitle p-1 rounded-1 text-white-50 text-sm" style="minimum-width: 10px;"> @playlist.Songs.Count() songs</div>
-            </div>
-        </a>
+                <div class=" p-2 " >
+                    <div class="card-title p-2 rounded-1 text-white" style="minimum-width: 10px;">@playlist.Title</div>
+                    <div class="card-subtitle p-1 rounded-1 text-white-50 text-sm" style="minimum-width: 10px;"> @playlist.Songs.Count() songs</div>
+                </div>
+            </a>
 
     }
 </div> 
@@ -71,18 +71,19 @@
 
     private string newPlaylistName = "";
 
-    protected override async void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         await playlistService.LoadPlaylists();
+        InvokeAsync(StateHasChanged);
     }
 
     private async Task CreatePlaylist()
     {
-         if (string.IsNullOrEmpty(newPlaylistName)) return;
+        if (string.IsNullOrEmpty(newPlaylistName)) return;
         await playlistService.CreatePlayList(newPlaylistName);
+         InvokeAsync(StateHasChanged);
         newPlaylistName = "";
-        // playlistsMock.Add(new Playlist { Title = newPlaylistName });
-        // newPlaylistName = "";
+        
 
     }
     private async Task GoToPlaylist(Playlist playlist)

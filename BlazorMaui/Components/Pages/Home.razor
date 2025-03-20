@@ -7,6 +7,7 @@
 @using BlazorMaui.Services.Interfaces
 
 @inject NavigationManager Navigation
+@inject IBeatsService BeatsService
 @inject IAuthService AuthService
 @inject HttpClient Client
 
@@ -57,24 +58,24 @@ else
 
 <style>
     .playlist-customlink {
-        text-decoration: inherit;
+    text-decoration: inherit;
     }
 
-        .playlist-customlink:hover {
-            cursor: pointer;
-        }
+    .playlist-customlink:hover {
+    cursor: pointer;
+    }
 
     .container-body {
-        border-left-color: white;
-        color: white;
-        background-color: rgb(33,33,33, 0.4);
-        margin: 7px;
+    border-left-color: white;
+    color: white;
+    background-color: rgb(33,33,33, 0.4);
+    margin: 7px;
     }
 
-        .container-body:hover {
-            border-left-color: darkslateblue; /* Changes background color on hover */
-            color: white; /* Changes text color */
-        }
+    .container-body:hover {
+    border-left-color: darkslateblue; /* Changes background color on hover */
+    color: white; /* Changes text color */
+    }
 </style>
 @code {
     private bool isAuthenticated;
@@ -129,7 +130,7 @@ else
                 var jsonResponse = await rawRes.Content.ReadAsStringAsync();
                 var user = JsonSerializer.Deserialize<User>(jsonResponse, options);
                 userEmail = user.Email;
-                AuthService.StoreUserId(user.Id);
+                await AuthService.StoreUserId(user.Id);
                 isLoading = false;
             }
             catch (Exception e)
@@ -156,6 +157,8 @@ else
     private async Task Logout()
     {
         await AuthService.LogoutAsync();
+        BeatsService.UploadedAudioFromServer.Clear();
+        BeatsService.UploadedAudio.Clear();
         isAuthenticated = false;
     }
 }

@@ -2,6 +2,7 @@
 @using BlazorMaui.Services.Interfaces
 @using BlazorMaui.Components
 @inject IBeatsService BeatsService
+@inject IAuthService AuthService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 <h3>Cloud Library</h3>
@@ -12,92 +13,99 @@ Genre
     <option value="">All</option>
     @foreach (var genre in AvailableGenres)
     {
-            <option value="@genre">@genre</option>
+                <option value="@genre">@genre</option>
     }
 </select>
 @if (isLoading)
 {
-        <div class="text-white-50">Loading...</div>
-        <div class="audio-player">
+            <div class="text-white-50">Loading...</div>
+            <div class="audio-player">
         @* <div class="album-cover"></div> *@
-            <div class="player-controls">
-                <div class="song-info">
-                    <div class="song-title"> </div>
-                    <p class="artist">Bpm</p>
-                </div>
-                <div class=" waveform-container">
+                <div class="player-controls">
+                    <div class="song-info">
+                        <div class="song-title"> </div>
+                        <p class="artist">Bpm</p>
+                    </div>
+                    <div class=" waveform-container">
 
                 @* <div class="progress" style="width: @((widthUnit == 0  && CompareMediaSoruce(beat)) ? 0 : widthUnit)% ;"></div> *@
 
 
-                    <!-- static waveform -->
-                    <div class="waveform static-waveform">
+                        <!-- static waveform -->
+                        <div class="waveform static-waveform">
+                        </div>
+
+                        <!-- Progress waveform -->
+                        <div class="waveform dynamic-waveform ">
+                        </div>
+
+
+                    </div>
+                    <div class="buttons">
+                        <Button CssClass="play-btn-2 "><svg viewBox="0 0 16 16" class="bi bi-play-fill" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg" style="color: white"> <path fill="white" d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"></path> </svg></Button>
+                        <Button>Edit</Button>
                     </div>
 
-                    <!-- Progress waveform -->
-                    <div class="waveform dynamic-waveform ">
-                    </div>
-
-
                 </div>
-                <div class="buttons">
-                    <Button CssClass="play-btn-2 "><svg viewBox="0 0 16 16" class="bi bi-play-fill" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg" style="color: white"> <path fill="white" d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"></path> </svg></Button>
-                    <Button>Edit</Button>
-                </div>
-
             </div>
-        </div>
 }
 
-
-@foreach (var beat in FilteredBeats)
+@if (isAuthorized)
 {
 
-
-    @* <AudioCard Beat="@beat" /> *@
-        <div class="audio-player">
-        @* <div class="album-cover"></div> *@
-            <div class="player-controls">
-                <div class="song-info">
-                    <div class="song-title"> @beat.Title</div>
-                    <p class="artist">@beat.Genre @beat.Bpm Bpm</p>
-                </div>
-                <div class=" waveform-container">
-
-                @* <div class="progress" style="width: @((widthUnit == 0  && CompareMediaSoruce(beat)) ? 0 : widthUnit)% ;"></div> *@
+    @foreach (var beat in FilteredBeats)
+    {
 
 
-                    <!-- static waveform -->
-                    <div class="waveform static-waveform">
+        @* <AudioCard Beat="@beat" /> *@
+                        <div class="audio-player">
+            @* <div class="album-cover"></div> *@
+                            <div class="player-controls">
+                                <div class="song-info">
+                                    <div class="song-title"> @beat.Title</div>
+                                    <p class="artist">@beat.Genre @beat.Bpm Bpm</p>
+                                </div>
+                                <div class=" waveform-container">
 
-                        <img src="data:image/bmp;base64,@beat.WaveFormImageBase64" draggable="false" />
-                    </div>
-
-                    <!-- Progress waveform -->
-                    <div class="waveform dynamic-waveform @(currentlyPlaying == beat ? "isPlaying" : "")">
-                        <img src="data:image/bmp;base64,@beat.WaveFormImageBase64" draggable="false" />
-                    </div>
-
-
-                </div>
-
-            @* <input ref="slider" type="range" min="0" max="@waveformWidth" value="@widthUnit" @oninput="OnSliderChanged" class="waveform-slider" /> *@
+                    @* <div class="progress" style="width: @((widthUnit == 0  && CompareMediaSoruce(beat)) ? 0 : widthUnit)% ;"></div> *@
 
 
-            </div>
+                                    <!-- static waveform -->
+                                    <div class="waveform static-waveform">
+
+                                        <img src="data:image/bmp;base64,@beat.WaveFormImageBase64" draggable="false" />
+                                    </div>
+
+                                    <!-- Progress waveform -->
+                                    <div class="waveform dynamic-waveform @(currentlyPlaying == beat ? "isPlaying" : "")">
+                                        <img src="data:image/bmp;base64,@beat.WaveFormImageBase64" draggable="false" />
+                                    </div>
 
 
-            <div class="buttons">
-                <Button OnClick=" async () => await OnPlayBtnClick(beat)" CssClass="play-btn-2 "><svg viewBox="0 0 16 16" class="bi bi-play-fill" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg" style="color: white"> <path fill="white" d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"></path> </svg></Button>
-                <Button OnClick=" async() => await HandleOnEdit(beat.Id)">Edit</Button>
-            </div>
+                                </div>
 
-        </div>
+                @* <input ref="slider" type="range" min="0" max="@waveformWidth" value="@widthUnit" @oninput="OnSliderChanged" class="waveform-slider" /> *@
 
 
+                            </div>
+
+
+                            <div class="buttons">
+                                <Button OnClick=" async () => await OnPlayBtnClick(beat)" CssClass="play-btn-2 "><svg viewBox="0 0 16 16" class="bi bi-play-fill" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg" style="color: white"> <path fill="white" d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"></path> </svg></Button>
+                                <Button OnClick=" async() => await HandleOnEdit(beat.Id)">Edit</Button>
+                            </div>
+
+                        </div>
+
+
+
+    }
 
 }
-
+else
+{
+            <h2 class="white-50">You need to be logged in</h2>
+}
 <style>
     .waveform-container {
     position: relative;
@@ -148,9 +156,8 @@ Genre
 @code {
     protected async override Task OnInitializedAsync()
     {
-
+        isAuthorized = await AuthService.IsUserAuthenticatedAsync();
         InvokeAsync(StateHasChanged);
-        isLoading = true;
         var task = BeatsService.GetAudioFromServer();
         MainPage.Instance.ShowAudioElement();
         MainPage.Instance.MediaEnded += OnAudioEnded;
@@ -162,7 +169,7 @@ Genre
 
     }
 
-
+    private bool isAuthorized;
     private async Task HandleOnEdit(int id)
     {
         Navigation.NavigateTo($"/editbeat/{id}");
@@ -170,7 +177,7 @@ Genre
 
     private int wavePos = 0;
 
-    private bool isLoading;
+    private bool isLoading = true;
     private async Task OnPlayBtnClick(Beat beat)
     {
         currentlyPlaying = beat;

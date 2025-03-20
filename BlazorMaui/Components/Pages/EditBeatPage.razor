@@ -71,6 +71,7 @@
     }
     private async Task PublishAudio()
     {
+        publishMessage = "publishing...";
         if (!await Auth.IsUserAuthenticatedAsync())
         {
             return;
@@ -83,6 +84,7 @@
         }
 
         publishMessage = "Published successfully";
+        Navigation.NavigateTo("/mylibrary");
 
     }
     private async Task TrigerDeleteWarning()
@@ -95,6 +97,7 @@
 
         if (BeatsService.FileToEdit == null)
         {
+            deleteMessage = "Deleting...";
             await DeleteBeatFromCloud(newBeat.Id);
             Navigation.NavigateTo("/cloudlibrary");
             return;
@@ -103,7 +106,7 @@
 
         if (await BeatsService.DeleteLocalAudio(oldBeat))
         {
-
+            deleteMessage = "Deleting...";
             Navigation.NavigateTo("/mylibrary");
         }
     }

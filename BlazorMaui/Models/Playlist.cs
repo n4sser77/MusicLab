@@ -6,6 +6,7 @@ public class Playlist
     public Guid Id { get; set; }
     public string Title { get; set; } = "";
     public List<Beat> Songs { get; set; }
+    public int UserId { get; set; }
 
     public Playlist()
     {

@@ -19,7 +19,7 @@ public partial class Beat : ObservableObject
     [ObservableProperty]
     private int? plays;
 
-    
+
 
     [ObservableProperty]
     private bool isVisible;
@@ -28,6 +28,8 @@ public partial class Beat : ObservableObject
     private string audioUrl;
     [ObservableProperty]
     private string waveFormImageBase64;
+
+    private int userId;
 
 
 

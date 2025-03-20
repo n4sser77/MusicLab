@@ -6,6 +6,7 @@ public interface IAuthService
     public int UserId { get; set; }
 
     public Task<bool> IsUserAuthenticatedAsync();
+    public Task UpdateUserId();
 
 
     public Task SaveTokenAsync(string token);
