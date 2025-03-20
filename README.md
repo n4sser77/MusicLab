@@ -28,7 +28,7 @@ This project is a Windows desktop application and is under active development. S
 *   **simplehttp:** was the initial backend written in a console app using HttpListner class, mostly for learning and understanding. Then ASP.NET was adopted then I switched to ASP.NET for scalability.
 *   **HttpServer:** is the active backend for the application that handles authentication, authorization, jwt token generation and validation. File proccessing from the client and streaming back to the client through REST apis
 
-  **In the project, there is a **
+  **In the project, there is a**
   * **manual singleton** – as per the requirements from my teacher – in both PlaylistService and PlaylistServiceFromRepository.
   *  For AuthService and BeatsService, I use .NET's built-in **singleton via dependency injection** along with abstraction through interfaces.
 
