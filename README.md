@@ -21,8 +21,8 @@ This project is a Windows desktop application and is under active development. S
 ![MusicLab application showing published audio files streamed from the server](MusicLabDemoPictures/cloud_library.png)
 ![MusicLab application showing editing audio meta data](MusicLabDemoPictures/Screenshot_2025-03-11_143346.png)
 ![MusicLab application showing playlists](MusicLabDemoPictures/playlists.png)
-![MusicLab application showing editing playlists](MusicLabDemoPictures/edit_playlists_1.png)
-![MusicLab application showing editing playlists](MusicLabDemoPictures/edit_playlists_2.png)
+![MusicLab application showing editing playlists](MusicLabDemoPictures/edit_playlist_1.png)
+![MusicLab application showing editing playlists](MusicLabDemoPictures/edit_playlist_2.png)
 
 **Backend**
 *   **simplehttp:** was the initial backend written in a console app using HttpListner class, mostly for learning and understanding. Then ASP.NET was adopted then I switched to ASP.NET for scalability.
